@@ -20,19 +20,6 @@
         // return lax if it is already instantiated
         if (this.lax) return this.lax;
 
-        function ActionPromise(executor) {
-            let promise = new Promise(executor);
-
-            function then(callback) {
-                promise = promise.then($A.getCallback(callback));
-                return this;
-            }
-
-            return {
-                then: then
-            };
-        }
-
         this.lax = (function(){
 
             function setContext(component) {
@@ -40,7 +27,7 @@
             }
 
             function enqueue(actionName, params, options) {
-                return new ActionPromise((resolve, reject) => {
+                return new Promise($A.getCallback((resolve, reject) => {
                     const action = this.context.get(actionName);
 
                     if (params) {
@@ -62,12 +49,21 @@
                         }
                     });
                     $A.enqueueAction(action);
+                }));
+            }
+
+            function enqueueAll(actions) {
+                const promises = actions.map((action) => {
+                    return enqueue.call(this, action.name, action.params, action.options);
                 });
+
+                return Promise.all(promises);
             }
 
             return {
                 setContext: setContext,
-                enqueue: enqueue
+                enqueue: enqueue,
+                enqueueAll: enqueueAll
             };
         })();
 
