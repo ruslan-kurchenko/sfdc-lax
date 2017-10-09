@@ -1,0 +1,13 @@
+<aura:component controller="LaxExamplesController">
+    <c:lax context="{!this}" />
+
+    <aura:attribute name="resolvedValue" type="String" />
+
+    <aura:handler name="init" action="{!c.onInit}" value="{!this}" />
+
+    <lightning:card title="ResolveComponent" class="slds-p-horizontal--medium">
+        <pre>
+            resolved value - {!v.resolvedValue}
+        </pre>
+    </lightning:card>
+</aura:component>

@@ -1,0 +1,15 @@
+<aura:component controller="LaxExamplesController">
+    <c:lax context="{!this}" />
+
+    <aura:attribute name="records" type="Contact[]" />
+
+    <aura:handler name="init" action="{!c.onInit}" value="{!this}" />
+
+    <lightning:card title="ContactList" class="slds-p-horizontal--medium">
+        <pre>
+            <aura:iteration items="{!v.records}" var="contact">
+                {!contact.Name}
+            </aura:iteration>
+        </pre>
+    </lightning:card>
+</aura:component>

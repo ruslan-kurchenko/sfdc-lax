@@ -1,0 +1,29 @@
+<aura:component controller="LaxExamplesController">
+    <c:lax context="{!this}" />
+
+    <aura:attribute name="contacts" type="Contact[]" />
+    <aura:attribute name="accounts" type="Account[]" />
+    <aura:attribute name="opportunities" type="Opportunity[]" />
+
+    <aura:handler name="init" action="{!c.onInit}" value="{!this}" />
+
+    <lightning:card title="EnqueueAllComponent" class="slds-p-horizontal--medium" >
+        <pre>
+            Contacts:
+            <aura:iteration items="{!v.contacts}" var="contact">
+                {!contact.Name},
+            </aura:iteration>
+
+            Accounts:
+            <aura:iteration items="{!v.accounts}" var="account">
+                {!account.Name},
+            </aura:iteration>
+
+            Opportunities:
+            <aura:iteration items="{!v.opportunities}" var="opp">
+                {!opp.Name},
+            </aura:iteration>
+        </pre>
+    </lightning:card>
+
+</aura:component>

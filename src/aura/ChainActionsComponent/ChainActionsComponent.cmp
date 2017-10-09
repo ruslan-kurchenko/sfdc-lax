@@ -1,0 +1,15 @@
+<aura:component controller="LaxExamplesController">
+    <c:lax context="{!this}" />
+
+    <aura:attribute name="parentValue" type="String" />
+    <aura:attribute name="dependentValue" type="String" />
+
+    <aura:handler name="init" action="{!c.onInit}" value="{!this}" />
+
+    <lightning:card title="ChainActionsComponent" class="slds-p-horizontal--medium">
+        <pre>
+            parent = {!v.parentValue}
+            dependent = {!v.dependentValue}
+        </pre>
+    </lightning:card>
+</aura:component>
