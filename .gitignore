@@ -1,3 +1,6 @@
 .gitignore
 .apex/
 .idea/
+node_modules
+package-lock.json
+sfdc-lax.iml

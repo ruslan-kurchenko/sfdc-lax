@@ -1,5 +1,5 @@
 ({
-    onInit: function(component, event, helper) {
-        helper.init(component, event);
-    }
+  onInit: function onInit(component, event, helper) {
+    helper.init(component, event);
+  },
 });
