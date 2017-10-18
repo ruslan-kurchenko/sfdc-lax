@@ -38,4 +38,10 @@ public class LaxExamplesController {
         return 'DEPENDENT_VALUE ' + parentValue;
     }
 
+    @AuraEnabled
+    public static String getActionBuilderResult(String prefix) {
+        System.debug('\n\n prefix => ' + prefix + '\n');
+        return prefix + '_ACTION_BUILDER_RESULT_STRING';
+    }
+
 }

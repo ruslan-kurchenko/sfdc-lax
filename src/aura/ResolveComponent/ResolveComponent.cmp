@@ -2,12 +2,14 @@
     <c:lax context="{!this}" />
 
     <aura:attribute name="resolvedValue" type="String" />
+    <aura:attribute name="secondResolvedValue" type="String" />
 
     <aura:handler name="init" action="{!c.onInit}" value="{!this}" />
 
     <lightning:card title="ResolveComponent" class="slds-p-horizontal--medium">
         <pre>
             resolved value - {!v.resolvedValue}
+            second resolved value - {!v.secondResolvedValue}
         </pre>
     </lightning:card>
 </aura:component>

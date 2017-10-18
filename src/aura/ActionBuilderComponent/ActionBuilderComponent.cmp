@@ -1,0 +1,13 @@
+<aura:component controller="LaxExamplesController" description="ActionBuilderComponent">
+    <c:lax context="{!this}" />
+
+    <aura:attribute name="result" type="String" />
+
+    <aura:handler name="init" action="{!c.onInit}" value="{!this}" />
+
+    <lightning:card title="ActionBuilderComponent" class="slds-p-horizontal--medium">
+        <pre>
+            Built Action Result - {!v.result}
+        </pre>
+    </lightning:card>
+</aura:component>
