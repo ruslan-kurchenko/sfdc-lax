@@ -17,7 +17,7 @@
   },
 
   getLax: function getLax() {
-    const self = this;
+    const helper = this;
     // return lax if it is already instantiated
     if (this.lax) return this.lax;
 
@@ -28,26 +28,31 @@
 
       function setThen(callback) {
         resolveCallback = callback;
+        return this;
       }
 
       function setCatch(callback) {
         rejectCallback = callback;
+        return this;
       }
 
       function setParams(params) {
         action.setParams(params);
+        return this;
       }
 
       function setStorable() {
         action.setStorable();
+        return this;
       }
 
       function setBackground() {
         action.setBackground();
+        return this;
       }
 
       function enqueue() {
-        action.setCallback(component, new self.ActionRouter(resolveCallback, rejectCallback));
+        action.setCallback(component, helper.actionRouter(resolveCallback, rejectCallback));
         $A.enqueueAction(action);
       }
 
@@ -79,7 +84,7 @@
             if (options.isStorable) action.setStorable();
           }
 
-          action.setCallback(this.context, this.ActionRouter(resolve, reject));
+          action.setCallback(this.context, helper.actionRouter(resolve, reject));
           $A.enqueueAction(action);
         }));
       }
@@ -105,11 +110,11 @@
     return this.lax;
   },
 
-  ActionRouter: function ActionRouter(resolve, reject) {
+  actionRouter: function actionRouter(resolve, reject) {
     return (response) => {
       const state = response.getState();
 
-      if (this.context.isValid() && state === 'SUCCESS') {
+      if (state === 'SUCCESS') {
         resolve(response.getReturnValue());
       } else {
         reject(response.getError());
