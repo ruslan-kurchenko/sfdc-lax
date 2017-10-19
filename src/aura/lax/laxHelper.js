@@ -52,7 +52,7 @@
       }
 
       function enqueue() {
-        action.setCallback(component, helper.ActionRouter(resolveCallback, rejectCallback));
+        action.setCallback(component, helper.actionRouter(resolveCallback, rejectCallback));
         $A.enqueueAction(action);
       }
 
@@ -84,7 +84,7 @@
             if (options.isStorable) action.setStorable();
           }
 
-          action.setCallback(this.context, helper.ActionRouter(resolve, reject));
+          action.setCallback(this.context, helper.actionRouter(resolve, reject));
           $A.enqueueAction(action);
         }));
       }
@@ -110,7 +110,7 @@
     return this.lax;
   },
 
-  ActionRouter: function ActionRouter(resolve, reject) {
+  actionRouter: function actionRouter(resolve, reject) {
     return (response) => {
       const state = response.getState();
 
