@@ -1,79 +1,80 @@
 ({
   init: function init(component) {
-    // ready event
-    console.log('Lax "init" function');
+    const contextComponent = component.get('v.context'),
+      props = {
+        _component: {
+          writable: false,
+          configurable: false,
+          enumerable: false,
+          value: contextComponent
+        }
+      },
+      lax = Object.create(this.getLax(), props);
 
-
-    // context component
-    const context = component.get('v.context');
-    const lax = this.getLax();
-
-    // dynamic getter
-    const laxGetter = function laxGetter() {
-      lax.setContext(this);
-      return lax;
-    };
-    Object.defineProperty(context, 'lax', { get: laxGetter });
+    Object.defineProperty(contextComponent, 'lax', { get: function() { return lax; } });
   },
 
   getLax: function getLax() {
-    const helper = this;
-    // return lax if it is already instantiated
-    if (this.lax) return this.lax;
+    if (!this._lax) {
+        this._lax = this.createLax();
+    }
 
-    function LaxAction(component, actionName) {
-      const action = component.get(actionName);
-      let resolveCallback;
-      let rejectCallback;
+    return this._lax;
+  },
 
-      function setThen(callback) {
-        resolveCallback = callback;
-        return this;
-      }
+  createLax: function createLax() {
 
-      function setCatch(callback) {
-        rejectCallback = callback;
-        return this;
-      }
+    function actionRouter(resolve, reject) {
+      return (response) => {
+        const state = response.getState();
 
-      function setParams(params) {
-        action.setParams(params);
-        return this;
-      }
-
-      function setStorable() {
-        action.setStorable();
-        return this;
-      }
-
-      function setBackground() {
-        action.setBackground();
-        return this;
-      }
-
-      function enqueue() {
-        action.setCallback(component, helper.actionRouter(resolveCallback, rejectCallback));
-        $A.enqueueAction(action);
-      }
-
-      return {
-        setThen: setThen,
-        setCatch: setCatch,
-        setParams: setParams,
-        setStorable: setStorable,
-        setBackground: setBackground,
-        enqueue: enqueue,
+        if (state === 'SUCCESS') {
+          resolve(response.getReturnValue());
+        } else {
+          reject(response.getError());
+        }
       };
     }
 
-    this.lax = (function Lax() {
-      function setContext(component) {
-        this.context = component;
+    const laxAction = {
+
+      setThen: function setThen(callback) {
+        this._resolveCallback = callback;
+        return this;
+      },
+
+      setCatch: function setCatch(callback) {
+        this._rejectCallback = callback;
+        return this;
+      },
+
+      setParams: function setParams(params) {
+        this._action.setParams(params);
+        return this;
+      },
+
+      setStorable: function setStorable() {
+        this._action.setStorable();
+        return this;
+      },
+
+      setBackground: function setBackground() {
+        this._action.setBackground();
+        return this;
+      },
+
+      enqueue: function enqueue() {
+        this._action.setCallback(this._component, actionRouter(this._resolveCallback, this._rejectCallback));
+        $A.enqueueAction(this._action);
       }
 
-      function enqueue(actionName, params, options) {
+    };
+
+    const lax = {
+
+      enqueue: function enqueue(actionName, params, options) {
         return new Promise($A.getCallback((resolve, reject) => {
-          const action = this.context.get(actionName);
+          const action = this._component.get(actionName);
 
           if (params) {
             action.setParams(params);
@@ -84,42 +85,40 @@
             if (options.isStorable) action.setStorable();
           }
 
-          action.setCallback(this.context, helper.actionRouter(resolve, reject));
+          action.setCallback(this._component, actionRouter(resolve, reject));
           $A.enqueueAction(action);
         }));
-      }
+      },
 
-      function enqueueAll(actions) {
-        const promises = actions.map(a => enqueue.call(this, a.name, a.params, a.options));
+      enqueueAll: function enqueueAll(actions) {
+        const promises = actions.map(a => this.enqueue.call(this, a.name, a.params, a.options));
 
         return Promise.all(promises);
+      },
+
+      action: function action(actionName) {
+        const c = this._component,
+          props = {
+            _component: {
+              writable: false,
+              configurable: false,
+              enumerable: false,
+              value: c
+            },
+            _action: {
+              writable: false,
+              configurable: false,
+              enumerable: false,
+              value: c.get(actionName)
+            }
+          };
+        return Object.create(laxAction, props);
       }
 
-      function action(actionName) {
-        return new LaxAction(this.context, actionName);
-      }
-
-      return {
-        setContext: setContext,
-        enqueue: enqueue,
-        enqueueAll: enqueueAll,
-        action: action,
-      };
-    }());
-
-    return this.lax;
-  },
-
-  actionRouter: function actionRouter(resolve, reject) {
-    return (response) => {
-      const state = response.getState();
-
-      if (state === 'SUCCESS') {
-        resolve(response.getReturnValue());
-      } else {
-        reject(response.getError());
-      }
     };
+
+    return lax;
   },
+
 });
 
