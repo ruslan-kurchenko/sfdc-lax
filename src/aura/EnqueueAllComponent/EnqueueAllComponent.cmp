@@ -1,9 +1,9 @@
 <aura:component controller="LaxExamplesController">
     <c:lax context="{!this}" />
 
-    <aura:attribute name="contacts" type="Contact[]" />
-    <aura:attribute name="accounts" type="Account[]" />
-    <aura:attribute name="opportunities" type="Opportunity[]" />
+    <aura:attribute name="contacts" type="Contact[]" access="private"/>
+    <aura:attribute name="accounts" type="Account[]" access="private"/>
+    <aura:attribute name="opportunities" type="Opportunity[]" access="private"/>
 
     <aura:handler name="init" action="{!c.onInit}" value="{!this}" />
 

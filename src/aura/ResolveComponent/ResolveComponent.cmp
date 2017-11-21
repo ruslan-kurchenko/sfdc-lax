@@ -1,8 +1,8 @@
 <aura:component controller="LaxExamplesController">
     <c:lax context="{!this}" />
 
-    <aura:attribute name="resolvedValue" type="String" />
-    <aura:attribute name="secondResolvedValue" type="String" />
+    <aura:attribute name="resolvedValue" type="String" access="private"/>
+    <aura:attribute name="secondResolvedValue" type="String" access="private"/>
 
     <aura:handler name="init" action="{!c.onInit}" value="{!this}" />
 
