@@ -16,7 +16,7 @@
 
   getLax: function getLax() {
     if (!this._lax) {
-        this._lax = this.createLax();
+      this._lax = this.createLax();
     }
 
     return this._lax;
@@ -35,6 +35,29 @@
         }
       };
     }
+
+    function createAuraContextPromise(promise) {
+      const props = Object.assign({}, laxPromise);
+      Object.defineProperty(props, '_contextPromise', {
+        writable: false,
+        configurable: false,
+        enumerable: true,
+        value: promise
+      });
+
+      return Object.assign(Object.create(promise), props);
+    }
+
+    const laxPromise = {
+      then: function(callback) {
+         const promise = this._contextPromise.then.call(this._contextPromise, $A.getCallback(callback));
+         return createAuraContextPromise(promise);
+      },
+      catch: function(callback) {
+        const promise = this._contextPromise.catch.call(this._contextPromise, $A.getCallback(callback));
+        return createAuraContextPromise(promise);
+      }
+    };
 
     const laxAction = {
 
@@ -73,7 +96,7 @@
     const lax = {
 
       enqueue: function enqueue(actionName, params, options) {
-        return new Promise($A.getCallback((resolve, reject) => {
+        const promise = new Promise((resolve, reject) => {
           const action = this._component.get(actionName);
 
           if (params) {
@@ -87,13 +110,15 @@
 
           action.setCallback(this._component, actionRouter(resolve, reject));
           $A.enqueueAction(action);
-        }));
+        });
+
+        return createAuraContextPromise(promise);
       },
 
       enqueueAll: function enqueueAll(actions) {
         const promises = actions.map(a => this.enqueue.call(this, a.name, a.params, a.options));
 
-        return Promise.all(promises);
+        return createAuraContextPromise(Promise.all(promises));
       },
 
       action: function action(actionName) {
