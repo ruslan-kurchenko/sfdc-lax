@@ -4,6 +4,10 @@
    * @param component {Object} - the lax component object
    */
   init: function init(component) {
+    /**
+     * @namespace
+     * @property {Lax} lax
+     */
     const contextComponent = component.get('v.context');
     const laxProps = {
       _component: {
@@ -70,7 +74,7 @@
      * The container of the actual context promise.
      * It helps to call chain function (<code>then</code>, <code>catch</code>)
      * in the Aura context. The client can avoid of <code>$A.getCallback</code> calls.
-     * @type {{then: then, catch: catch}}
+     * @type {{then: Function, catch: Function}}
      */
     const laxPromise = {
       then: function (callback) {
@@ -106,14 +110,14 @@
      * The object based on builder pattern to call Aura action.
      * It is instantiated to be used by {@link Lax} as a prototype of actual actions.
      * This type of action does not use Promise approach and subsequently can be called as storable.
-     * @typedef {{setThen: setThen, setCatch: setCatch, setParams: setParams, setStorable: setStorable, setBackground: setBackground, enqueue: enqueue}} LaxAction
+     * @typedef {{setThen: Function, setCatch: Function, setParams: Function, setStorable: Function, setBackground: Function, enqueue: Function}} LaxAction
      */
     const laxAction = {
 
       /**
        * Assign the success callback on Aura action
        * @param callback {Function}
-       * @returns {laxAction}
+       * @returns {LaxAction}
        */
       setThen: function setThen(callback) {
         this._resolveCallback = callback;
@@ -123,7 +127,7 @@
       /**
        * Assigns the failure callback on Aura action. This function called when the error occurs.
        * @param callback {Function}
-       * @returns {laxAction}
+       * @returns {LaxAction}
        */
       setCatch: function setCatch(callback) {
         this._rejectCallback = callback;
@@ -133,7 +137,7 @@
       /**
        * Sets parameters for the action.
        * @param params {Object}
-       * @returns {laxAction}
+       * @returns {LaxAction}
        */
       setParams: function setParams(params) {
         this._action.setParams(params);
@@ -142,7 +146,7 @@
 
       /**
        * Marks the action as a {@link https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/controllers_server_storable_actions.htm|Storable}
-       * @returns {laxAction}
+       * @returns {LaxAction}
        */
       setStorable: function setStorable() {
         this._action.setStorable();
@@ -151,7 +155,7 @@
 
       /**
        * Marks the action as a {@link https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/controllers_server_background_actions.htm|Background}
-       * @returns {laxAction}
+       * @returns {LaxAction}
        */
       setBackground: function setBackground() {
         this._action.setBackground();
@@ -172,7 +176,7 @@
     /**
      * The action main object of the component that is used as a shared prototype across all lax components
      * created in the application. See <code>init</code> function of the laxHelper.js where the lax assigned as prototype.
-     * @typedef {{enqueue: enqueue, enqueueAll: enqueueAll, action: action}} Lax
+     * @typedef {{enqueue: Function, enqueueAll: Function, action: Function}} Lax
      */
     const lax = {
 
