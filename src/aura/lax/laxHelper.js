@@ -18,7 +18,6 @@
     // the Lax object due to prototype inheritance
     const lax = Object.create(this.getLax(), laxProps);
 
-
     // Create Lax property on the context component object that is refer on
     // newly created Lax object
     const componentProps = {
@@ -192,8 +191,9 @@
        * options for the action
        */
       enqueue: function enqueue(actionName, params, options) {
+        const self = this;
         const promise = new Promise(function (resolve, reject) {
-          const action = this._component.get(actionName);
+          const action = self._component.get(actionName);
 
           if (params) {
             action.setParams(params);
@@ -204,7 +204,7 @@
             if (options.storable) action.setStorable();
           }
 
-          action.setCallback(this._component, actionRouter(resolve, reject));
+          action.setCallback(self._component, actionRouter(resolve, reject));
           $A.enqueueAction(action);
         });
 
@@ -218,8 +218,9 @@
        * @param actions {{name: String, params: Object, options: ActionOptions}[]}
        */
       enqueueAll: function enqueueAll(actions) {
+        const self = this;
         const promises = actions.map(function (a) {
-          return this.enqueue.call(this, a.name, a.params, a.options);
+          return self.enqueue.call(self, a.name, a.params, a.options);
         });
 
         return createAuraContextPromise(Promise.all(promises));
