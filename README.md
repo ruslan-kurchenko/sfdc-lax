@@ -6,7 +6,7 @@ The list of main benefits:
 1. Every consumer component has its own reference of Lax component and vise-versa. It allows to write the code without passing component reference in every util function: `component.lax.enqueue('c.actionName')`;
 2. The server-side actions calls can be chained: `component.lax.enqueue('c.actionName').then(...).then(...)`;
 3. The list of server-side actions can be called together: `component.lax.enqueueAll([...]).then(...)`;
-4. The action can be constructed and called using Builder Pattern approach: `component.lax.action('c.actionName).setThe(...).enqueue()` 
+4. The action can be constructed and called using Builder Pattern approach: `component.lax.action('c.actionName).setThen(...).enqueue()` 
 5. The consumer component can omit `$A.getCallback()`. Lax provide overrode Promise `then` and `catch` and they do that automarically: `component.lax.enqueue('c.actionName').then(...)`;
 6. The consumer component doesn't wait `afterScriptsLoaded` event. It can use Lax in `onInit` event handler 
 
