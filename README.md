@@ -2,9 +2,6 @@
 
 The component provides an ability to write a clear asynchronous Lightning Components JavaScript code.
 
-> Current version of the component contains an API to run [Lightning Component Server-Side Actions](https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/controllers_server_actions_call.htm)
-> In the near future will be added Application and Component Events 
-
 The list of main benefits:
 1. Every consumer component has its own reference of Lax component and vise-versa. It allows to write the code without passing component reference in every util function: `component.lax.enqueue('c.actionName')`;
 2. The server-side actions calls can be chained: `component.lax.enqueue('c.actionName').then(...).then(...)`;
@@ -127,6 +124,11 @@ The examples below include an information about how Lax can be used in consumer 
 ## Tests
 
 > Comming soon...
+
+## Future plans
+
+1. Fire Application or Component event in Builder Pattern approach
+2. [Dynamically Create Component](https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/js_cb_dynamic_cmp_async.htm) functionality with Promise callbacks
 
 ## License
 
