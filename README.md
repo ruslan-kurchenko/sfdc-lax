@@ -1,6 +1,6 @@
 # lax
 
-The component to write a clear asynchronous Lightning Components JavaScript code with Promises
+The service Lightning Component to write a clear asynchronous JavaScript code
 
 ## Features
 
