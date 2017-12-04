@@ -116,7 +116,8 @@ component.lax.enqueueAll([
     - `name` - the name of an action
     - `params` - an object with list of parameters _(optional)_
     - `options` - an object with list of options that can be applied to the action _(optional)_
-- `results` - The list of values returned from enqueued actions
+- The success callback will call when all enqueued actions back from the server
+- `results` - The list of values returned from enqueued actions 
 
 ##### `lax.action(name)` - create and return [LaxAction](https://github.com/ruslan-kurchenko/sfdc-lax/blob/master/src/aura/lax/laxHelper.js#L141) builder
 ```javascript
