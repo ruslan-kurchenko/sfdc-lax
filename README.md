@@ -144,7 +144,7 @@ component.lax
     - `setCatch(callback)` - set failure callback function to handler server-side errors
     - `enqueue()` - enqueue constructed action. The only function `LaxAction` that return `undefined`
     - `setStorable()` - set an action as a [Storable](https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/controllers_server_storable_actions.htm)
-    - `setBackround()` - set an action as a [Background](https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/controllers_server_background_actions.htm)
+    - `setBackground()` - set an action as a [Background](https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/controllers_server_background_actions.htm)
 
 ## Future plans
 
