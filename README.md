@@ -1,64 +1,56 @@
-## Lax
+# lax
 
-The component provides an ability to write a clear asynchronous Lightning Components JavaScript code.
+The component to write a clear asynchronous Lightning Components JavaScript code with Promises
 
-The list of main benefits:
-1. Every consumer component has its own reference of Lax component and vise-versa. It allows to write the code without passing component reference in every util function: `component.lax.enqueue('c.actionName')`;
-2. The server-side actions calls can be chained: `component.lax.enqueue('c.actionName').then(...).then(...)`;
-3. The list of server-side actions can be called together: `component.lax.enqueueAll([...]).then(...)`;
-4. The action can be constructed and called using Builder Pattern approach: `component.lax.action('c.actionName).setThen(...).enqueue()` 
-5. The consumer component can omit `$A.getCallback()`. Lax provide overrode Promise `then` and `catch` and they do that automarically: `component.lax.enqueue('c.actionName').then(...)`;
-6. The consumer component doesn't wait `afterScriptsLoaded` event. It can use Lax in `onInit` event handler 
+## Features
 
-## Installation
+- `lax` gets the context of consumer component
+- Supports the [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) API
+    - Set server-side action callback (success and failure)
+    - Chain server-side actions
+    - Perform multiple concurrent server-side actions
+- Construct server-side action using Builder Pattern approach
+- Automatically wraps callback by `$A.getCallback()`
+- Use `lax` in consumer's component [aura:valueInit](https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/ref_aura_valueInit.htm) event handler
 
-Click on the button below to deploy the component's sources to the org.
+## Installing
+
+Click on the button below to deploy the component to the org
 
 [![Deploy to Salesforce](https://raw.githubusercontent.com/afawcett/githubsfdeploy/master/src/main/webapp/resources/img/deploy.png)](https://githubsfdeploy.herokuapp.com/app/githubdeploy/ruslan-kurchenko/sfdc-lax)
 
-## Usage
+## Example
 
-Define Lax component in your custom component's markup:
-```html
-<aura:component>
-    <c:lax context="{!this}" />
-</aura:component>
-```
-
-List of available component attributes:
-
-| Attribute | Description                                                 | Required |
-|-----------|-------------------------------------------------------------|----------|
-| `context` | A consumer component object which instantiate Lax component | `true`   |
-
-Lax dynamically add a property on the consumer component `onInit` event.
-
-Due to [Lightning Components Rendering Lifecycle](https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/components_lifecycle.htm) nested components fire `onInit` event before the consumer component.
-
-Then consumer component can use Lax in his own `onInit` action handler:
-
+Define `lax` component in a custom component markup:
 ```html
 <!-- ContactsComponent.cmp -->
 <aura:component controller="LaxExamplesController">
+    <!-- Define lax component and pass consumer's component object as a context attribute (required) -->
     <c:lax context="{!this}" />
+    
     <aura:attribute name="records" type="Contact[]" access="private"/>
     <aura:handler name="init" action="{!c.onInit}" value="{!this}" />
 </aura:component>
 ```
+Enqueue an action in component's init function to ge initial data:
 ```JavaScript
 // ContactsComponentController.js
 ({
     onInit: function (component, event, helper) {
-        component.lax.enqueue('c.getContacts').then((contacts) => {
+        // equeue getContacts server-side action and set the callback
+        component.lax.enqueue('c.getContacts').then(contacts => {
+            // $A.getCallback is not required. lax does it automatically
             component.set('v.records', contacts);
         });
     }
 });
 ```
+###### NOTE
+- `lax` [automatically defines](https://github.com/ruslan-kurchenko/sfdc-lax/blob/master/src/aura/lax/laxHelper.js#L57) a property on the consumer's component ([context](https://github.com/ruslan-kurchenko/sfdc-lax/blob/master/src/aura/lax/laxHelper.js#L35)) object
+- `lax` is ready to use in consumer's component [aura:valueInit](https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/ref_aura_valueInit.htm) event handler
+- Every consumer component has its own `lax` object. Every `lax` object [inherits](https://github.com/ruslan-kurchenko/sfdc-lax/blob/master/src/aura/lax/laxHelper.js#L47) methods from [grand parent](https://github.com/ruslan-kurchenko/sfdc-lax/blob/master/src/aura/lax/laxHelper.js#L205)
 
-#### Code examples:
-The examples below include an information about how Lax can be used in consumer components JavaScript code (component Controller/Helper).
-
+### Define component
 1. Call simple action:
     ```JavaScript
     onInit: function (component, event, helper) {
