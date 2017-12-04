@@ -69,7 +69,7 @@ component.lax.enqueue('c.getContact', { id: recordId }, { background: true })
     - `background` - [to sent action separately from any foreground actions](https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/controllers_server_background_actions.htm)
     - `abortable` - [to make action potentially abortable while it's queued to be sent to the server](https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/controllers_server_abortable_actions.htm)
     - `storable` - [to quickly show action cached data from client-side storage without waiting for a server trip](https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/controllers_server_storable_actions.htm). 
-    It is recommended to use with [Promise API by Salesforce](https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/js_promises.htm). Use `lax.action` instead (TODO!)
+    It is not recommended to use with [Promise API by Salesforce](https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/js_promises.htm). Use `lax.action` instead (TODO!)
 - `.enqueue()` - The function returns [LaxPromise](https://github.com/ruslan-kurchenko/sfdc-lax/blob/master/src/aura/lax/laxHelper.js#L106) object which inherited from [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise). It overrides `.then()` and `.catch()` function to automatically wrapper callback using `$A.getCallback()`.
 
 ##### `lax.enqueue(name[, params[, options]]).then(callback).catch(callback)` - handle errors thrown by the server
