@@ -244,8 +244,8 @@
        * @method
        * @name Lax#enqueue
        * @param actionName {String} the name of the action (Apex controller method name)
-       * @param params {Object} the object that contains parameters for the action
-       * @param options {ActionOptions} the object with list of
+       * @param params {Object=} the object that contains parameters for the action
+       * @param options {ActionOptions=} the object with list of
        * options for the action
        * @returns {LaxPromise}
        */
@@ -276,7 +276,7 @@
        * The success callback assigned on the {@link Promise} called after all actions ready and an error have not thrown.
        * @method
        * @name Lax#enqueueAll
-       * @param actions {{name: String, params: Object, options: ActionOptions}[]}
+       * @param actions {{name: String, params: Object=, options: ActionOptions=}[]}
        * @returns {LaxPromise}
        */
       enqueueAll: function enqueueAll(actions) {

@@ -48,7 +48,7 @@ Enqueue an action in component's [aura:valueInit](https://developer.salesforce.c
 ###### NOTE
 - `lax` [automatically defines](https://github.com/ruslan-kurchenko/sfdc-lax/blob/master/src/aura/lax/laxHelper.js#L57) a property on the consumer's component ([context](https://github.com/ruslan-kurchenko/sfdc-lax/blob/master/src/aura/lax/laxHelper.js#L35)) object
 - `lax` is ready to use in consumer's component [aura:valueInit](https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/ref_aura_valueInit.htm) event handler
-- Every consumer component has its own `lax` object. Every `lax` object [inherits](https://github.com/ruslan-kurchenko/sfdc-lax/blob/master/src/aura/lax/laxHelper.js#L47) methods from [grand parent](https://github.com/ruslan-kurchenko/sfdc-lax/blob/master/src/aura/lax/laxHelper.js#L205)
+- Every consumer component has its own `lax` object. Every `lax` object [inherits](https://github.com/ruslan-kurchenko/sfdc-lax/blob/master/src/aura/lax/laxHelper.js#L47) methods from [grand parent](https://github.com/ruslan-kurchenko/sfdc-lax/blob/master/src/aura/lax/laxHelper.js#L233)
 
 ## API Reference
 
@@ -70,7 +70,7 @@ component.lax.enqueue('c.getContact', { id: recordId }, { background: true })
     - `abortable` - [to make action potentially abortable while it's queued to be sent to the server](https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/controllers_server_abortable_actions.htm)
     - `storable` - [to quickly show action cached data from client-side storage without waiting for a server trip](https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/controllers_server_storable_actions.htm). 
     It is not recommended to use with [Promise API by Salesforce](https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/js_promises.htm). Use [lax.action](https://github.com/ruslan-kurchenko/sfdc-lax/blob/master/README.md#laxactionname---create-and-return-laxaction-builder) instead
-- `.enqueue()` - The function returns [LaxPromise](https://github.com/ruslan-kurchenko/sfdc-lax/blob/master/src/aura/lax/laxHelper.js#L106) object which inherited from [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise). It overrides `.then()` and `.catch()` function to automatically wrapper callback using `$A.getCallback()`.
+- `.enqueue()` - The function returns [LaxPromise](https://github.com/ruslan-kurchenko/sfdc-lax/blob/master/src/aura/lax/laxHelper.js#L101) object which inherited from [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise). It overrides `.then()` and `.catch()` function to automatically wrapper callback using `$A.getCallback()`.
 
 ##### `lax.enqueue(name[, params[, options]]).then(callback).catch(callback)` - handle errors thrown by the server
 ```javascript
@@ -119,7 +119,7 @@ component.lax.enqueueAll([
 - The success callback will call when all enqueued actions be back from the server
 - `results` - The list of values returned from enqueued actions 
 
-##### `lax.action(name)` - create and return [LaxAction](https://github.com/ruslan-kurchenko/sfdc-lax/blob/master/src/aura/lax/laxHelper.js#L141) builder
+##### `lax.action(name)` - create and return [LaxAction](https://github.com/ruslan-kurchenko/sfdc-lax/blob/master/src/aura/lax/laxHelper.js#L153) builder
 ```javascript
 component.lax
     .action('c.getContact')
