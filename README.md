@@ -153,5 +153,5 @@ component.lax
 
 ## License
 
-[MIT](https://github.com/ruslan-kurchenko/sfdc-lax/blob/master/LICENSE)
+[MIT](https://github.com/ruslan-kurchenko/sfdc-lax/blob/master/docs/LICENSE)
 
