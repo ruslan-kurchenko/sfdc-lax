@@ -1,0 +1,15 @@
+<aura:component controller="LaxExamplesController">
+    <c:lax context="{!this}" />
+
+    <aura:attribute name="message" type="String" access="private"/>
+
+    <aura:handler action="{!c.onInit}" name="init" value="{!this}" />
+
+    <lightning:card title="Incomplete" class="slds-p-horizontal--medium">
+        <pre>
+            The result message: {!v.message}
+        </pre>
+
+        <lightning:button onclick="{!c.onClickResolveMessage}" label="Resolve Message" />
+    </lightning:card>
+</aura:component>
