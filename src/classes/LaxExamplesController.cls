@@ -44,4 +44,11 @@ public class LaxExamplesController {
         return prefix + '_ACTION_BUILDER_RESULT_STRING';
     }
 
+    @AuraEnabled
+    public static String getException() {
+        throw new AuraHandledException('It is custom message from the exception');
+
+        return 'This string will stay here forever';
+    }
+
 }

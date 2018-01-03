@@ -5,5 +5,6 @@
         <c:EnqueueAllComponent />
         <c:ResolveComponent />
         <c:ActionBuilderComponent />
+        <c:ExceptionComponent />
     </div>
 </aura:application>
