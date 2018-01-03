@@ -51,4 +51,9 @@ public class LaxExamplesController {
         return 'This string will stay here forever';
     }
 
+    @AuraEnabled
+    public static String getIncomplete() {
+        return 'You are online, switch of an internet connection using devtools to see expected result!';
+    }
+
 }

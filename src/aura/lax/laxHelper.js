@@ -88,8 +88,10 @@
 
         if (state === 'SUCCESS') {
           resolve(response.getReturnValue());
+        } else if (state === 'INCOMPLETE') {
+          reject(response.getError(), { incomplete: true });
         } else {
-          reject(response.getError());
+          reject(response.getError(), {});
         }
       };
     }
