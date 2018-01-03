@@ -1,0 +1,18 @@
+<aura:component controller="LaxExamplesController">
+    <c:lax context="{!this}"/>
+
+    <aura:attribute name="message" type="String" access="private"/>
+    <aura:attribute name="contacts" type="Contact[]" access="private"/>
+
+    <aura:handler name="init" action="{!c.onInit}" value="{!this}"/>
+
+    <lightning:card title="Exception" class="slds-p-horizontal--medium">
+        <pre>
+            The message from exception: {!v.message}
+            Contacts after exception handling:
+            <aura:iteration items="{!v.contacts}" var="contact">
+                    {!contact.Name}
+            </aura:iteration>
+        </pre>
+    </lightning:card>
+</aura:component>
