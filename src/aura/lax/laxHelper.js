@@ -88,10 +88,8 @@
 
         if (state === 'SUCCESS') {
           resolve(response.getReturnValue());
-        } else if (state === 'INCOMPLETE') {
-          reject(response.getError(), { incomplete: true });
         } else {
-          reject(response.getError(), {});
+          reject(response);
         }
       };
     }
@@ -123,9 +121,31 @@
        * @returns {LaxPromise}
        */
       catch: function (callback) {
-        const promise = this._contextPromise.catch.call(this._contextPromise, $A.getCallback(callback));
+        const handler = function(response) {
+          const state = response.getState();
+          if (state === 'INCOMPLETE') {
+            const errors = response.getError();
+            const message = errors.length === 1 ? errors[0].message : 'Disconnected or Canceled';
+
+            throw { name: 'IncompleteError', message: message };
+          } else {
+            callback(response.getError());
+          }
+        };
+
+        const promise = this._contextPromise.catch.call(this._contextPromise, $A.getCallback(handler));
         return createAuraContextPromise(promise);
       },
+
+      incomplete: function (callback) {
+        const handler = function (error) {
+          console.log('INCOMPLETE action handled!!!');
+          callback();
+        };
+
+        const promise = this._contextPromise.catch.call(this._contextPromise, $A.getCallback(handler));
+        return createAuraContextPromise(promise);
+      }
     };
 
     /**
