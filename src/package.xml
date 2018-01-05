@@ -1,8 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Package xmlns="http://soap.sforce.com/2006/04/metadata">
-  <types>
-    <name>AuraDefinitionBundle</name>
-    <members>lax</members>
-  </types>
-  <version>40.0</version>
+    <types>
+        <members>LaxExamplesController</members>
+        <name>ApexClass</name>
+    </types>
+    <types>
+        <members>ActionBuilderComponent</members>
+        <members>ChainActionsComponent</members>
+        <members>ContactList</members>
+        <members>EnqueueAllComponent</members>
+        <members>ExceptionComponent</members>
+        <members>LaxExampleApplication</members>
+        <members>ResolveComponent</members>
+        <members>lax</members>
+        <name>AuraDefinitionBundle</name>
+    </types>
+    <version>41.0</version>
 </Package>
