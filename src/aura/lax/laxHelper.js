@@ -88,11 +88,85 @@
 
         if (state === 'SUCCESS') {
           resolve(response.getReturnValue());
+        } else if (state === 'INCOMPLETE') {
+          reject(Object.assign(new IncompleteActionError(), response.getError()));
         } else {
-          reject(response.getError());
+          reject(Object.assign(new ApexActionError(), response.getError()));
         }
       };
     }
+
+
+    function ApexActionError(message) {
+      this.message = message;
+      this.name = 'ApexActionError';
+      Error.captureStackTrace(this, ApexActionError);
+    }
+    ApexActionError.prototype = Object.create(Error.prototype);
+    ApexActionError.prototype.constructor = ApexActionError;
+
+
+    function IncompleteActionError(message) {
+      this.message = message;
+      this.name = 'IncompleteActionError';
+      Error.captureStackTrace(this, IncompleteActionError);
+    }
+    IncompleteActionError.prototype = Object.create(Error.prototype);
+    IncompleteActionError.prototype.constructor = IncompleteActionError;
+
+    const errors = {
+      ApexActionError: ApexActionError,
+      IncompleteActionError: IncompleteActionError
+    };
+
+    const util = {
+      /**
+       * Create an object and bind it with passed in Promise prototype.
+       * It has own chaining functions (<code>then</code>, <code>catch</code>),
+       * with Aura context functionality. It allows to avoid of <code>$A.getCallback</code>
+       * on callback functions.
+       * @param promise {Promise}
+       * @returns {LaxPromise}
+       */
+      createAuraContextPromise: function (promise) {
+        const lp = Object.create(promise);
+        Object.defineProperty(lp, '_contextPromise', {
+          writable: false,
+          configurable: false,
+          enumerable: true,
+          value: promise,
+        });
+
+        return Object.assign(lp, laxPromise);
+      },
+
+      assignCatchFilters: function (handleErrors, callback, promise) {
+        return function routeError(error) {
+          for (let i = 0; i < handleErrors.length; i++) {
+            const errorType = handleErrors[i];
+            if (errorType === Error ||
+              (errorType != null && errorType.prototype instanceof Error)) {
+
+              if (error instanceof errorType || error.name === errorType.name) {
+                return util.tryCatch(callback).call(promise, error);
+              }
+            }
+          }
+
+          return Promise.reject(error);
+        };
+      },
+
+      tryCatch: function (callback) {
+        return function tryCallback() {
+          try {
+            return callback.apply(this, arguments);
+          } catch (e) {
+            return Promise.reject(e);
+          }
+        };
+      },
+    };
 
     /**
      * The container of the actual context promise.
@@ -105,46 +179,71 @@
        * The function to assign a success callback on an action
        * @method
        * @name LaxPromise#then
-       * @param callback {Function}
+       * @param onSuccess {Function|undefined} |
+       * @param onError {Function=}
        * @returns {LaxPromise}
        */
-      then: function (callback) {
-        const promise = this._contextPromise.then.call(this._contextPromise, $A.getCallback(callback));
-        return createAuraContextPromise(promise);
+      then: function (onSuccess, onError) {
+        // TODO: check: is for valid functions?
+
+        const promise = this._contextPromise.then(
+          (onSuccess ?  $A.getCallback(onSuccess) : undefined),
+          (onError ?  $A.getCallback(onError) : undefined)
+        );
+
+        return util.createAuraContextPromise(promise);
       },
 
       /**
        * The function to assign a failure callback on an action
        * @method
        * @name LaxPromise#catch
-       * @param callback {Function}
+       * @param onError {Function}
        * @returns {LaxPromise}
        */
-      catch: function (callback) {
-        const promise = this._contextPromise.catch.call(this._contextPromise, $A.getCallback(callback));
-        return createAuraContextPromise(promise);
+      catch: function (onError) {
+        let promise;
+        const len = arguments.length;
+        if (len > 1) {
+          const errorTypes = new Array(len - 1);
+          for (let i = 0; i < len - 1; i++) {
+            errorTypes[i] = arguments[i];
+          }
+          onError = arguments[len - 1];
+
+          const filteredOnReject = util.assignCatchFilters(errorTypes, onError, this);
+          promise = this.then(undefined, filteredOnReject);
+        } else {
+          promise = this.then(undefined, onError);
+        }
+
+        return util.createAuraContextPromise(promise);
+      },
+
+      /**
+       *
+       * @method
+       * @name LaxPromise#error
+       * @param onError {Function}
+       * @returns {LaxPromise}
+       */
+      error: function (onError) {
+        const fn = util.assignCatchFilters([ApexActionError], onError, this);
+        return this.then(undefined, fn);
+      },
+
+      /**
+       *
+       * @method
+       * @name LaxPromise#incomplete
+       * @param onIncomplete {Function}
+       * @returns {LaxPromise}
+       */
+      incomplete: function (onIncomplete) {
+        const fn = util.assignCatchFilters([IncompleteActionError], onIncomplete, this);
+        return this.then(undefined, fn);
       },
     };
-
-    /**
-     * Create an object and bind it with passed in Promise prototype.
-     * It has own chaining functions (<code>then</code>, <code>catch</code>),
-     * with Aura context functionality. It allows to avoid of <code>$A.getCallback</code>
-     * on callback functions.
-     * @param promise {Promise}
-     * @returns {LaxPromise}
-     */
-    function createAuraContextPromise(promise) {
-      const props = Object.assign({}, laxPromise);
-      Object.defineProperty(props, '_contextPromise', {
-        writable: false,
-        configurable: false,
-        enumerable: true,
-        value: promise,
-      });
-
-      return Object.assign(Object.create(promise), props);
-    }
 
     /**
      * The object based on builder pattern to call Aura action.
@@ -267,7 +366,7 @@
           $A.enqueueAction(action);
         });
 
-        return createAuraContextPromise(promise);
+        return util.createAuraContextPromise(promise);
       },
 
       /**
@@ -285,7 +384,7 @@
           return self.enqueue.call(self, a.name, a.params, a.options);
         });
 
-        return createAuraContextPromise(Promise.all(promises));
+        return util.createAuraContextPromise(Promise.all(promises));
       },
 
       /**
@@ -313,6 +412,8 @@
         };
         return Object.create(laxAction, props);
       },
+
+      errors: errors,
 
     };
 
