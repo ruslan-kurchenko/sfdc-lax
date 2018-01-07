@@ -101,7 +101,7 @@
           }
 
           const errorConstructor = state === 'INCOMPLETE' ? errors.IncompleteActionError : errors.ApexActionError;
-          reject(errorConstructor.call({}, message, responseErrors));
+          reject(new errorConstructor(message, responseErrors));
         }
       };
     }
@@ -208,6 +208,11 @@
           promise = this.then(undefined, onError);
         }
 
+        return util.createAuraContextPromise(promise);
+      },
+
+      finally: function (callback) {
+        const promise = this._contextPromise.finally(callback);
         return util.createAuraContextPromise(promise);
       },
 
@@ -419,7 +424,7 @@
       this.name = 'ApexActionError';
       this.message = message;
       this.entries = entries;
-      Error.captureStackTrace(this, ApexActionError);
+      this.stack = (new Error()).stack
     }
     ApexActionError.prototype = Object.create(Error.prototype);
     ApexActionError.prototype.constructor = ApexActionError;
@@ -429,7 +434,7 @@
       this.name = 'IncompleteActionError';
       this.message = message;
       this.entries = entries;
-      Error.captureStackTrace(this, IncompleteActionError);
+      this.stack = (new Error()).stack
     }
     IncompleteActionError.prototype = Object.create(Error.prototype);
     IncompleteActionError.prototype.constructor = IncompleteActionError;

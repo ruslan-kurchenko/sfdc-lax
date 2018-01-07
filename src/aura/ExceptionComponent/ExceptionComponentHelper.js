@@ -16,16 +16,11 @@
       .catch(e => {
         this.updateMessages(component, e.entries.map(er => er.message));
         console.log('IndexOfBoundException', e);
-      })
-      .incomplete(e => {
-        this.updateMessages(component, e.entries.map(er => er.message));
-        console.log('IncompleteError', e);
       });
 
     function CustomClientError(message) {
       this.name = 'CustomClientError';
       this.message = message;
-      Error.captureStackTrace(this, CustomClientError);
     }
     CustomClientError.prototype = Object.create(Error.prototype);
     CustomClientError.prototype.constructor = CustomClientError;
