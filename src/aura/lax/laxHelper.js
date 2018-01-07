@@ -76,6 +76,10 @@
    * @returns {Lax}
    */
   createLax: function createLax() {
+    const helper = this;
+
+    const errors = helper.defineErrors();
+
     /**
      * Creates a unified function to be assign as a callback on the aura action.
      * @param resolve {Function} the function called if the action is success
@@ -88,36 +92,19 @@
 
         if (state === 'SUCCESS') {
           resolve(response.getReturnValue());
-        } else if (state === 'INCOMPLETE') {
-          reject(Object.assign(new IncompleteActionError(), response.getError()));
         } else {
-          reject(Object.assign(new ApexActionError(), response.getError()));
+          let message = 'Unknown error';
+
+          const responseErrors = response.getError();
+          if (responseErrors && Array.isArray(responseErrors) && responseErrors.length > 0) {
+            message = responseErrors[0].message;
+          }
+
+          const errorConstructor = state === 'INCOMPLETE' ? errors.IncompleteActionError : errors.ApexActionError;
+          reject(errorConstructor.call({}, message, responseErrors));
         }
       };
     }
-
-
-    function ApexActionError(message) {
-      this.message = message;
-      this.name = 'ApexActionError';
-      Error.captureStackTrace(this, ApexActionError);
-    }
-    ApexActionError.prototype = Object.create(Error.prototype);
-    ApexActionError.prototype.constructor = ApexActionError;
-
-
-    function IncompleteActionError(message) {
-      this.message = message;
-      this.name = 'IncompleteActionError';
-      Error.captureStackTrace(this, IncompleteActionError);
-    }
-    IncompleteActionError.prototype = Object.create(Error.prototype);
-    IncompleteActionError.prototype.constructor = IncompleteActionError;
-
-    const errors = {
-      ApexActionError: ApexActionError,
-      IncompleteActionError: IncompleteActionError
-    };
 
     const util = {
       /**
@@ -166,6 +153,10 @@
           }
         };
       },
+
+      registerError: function (error) {
+        errors[error.name] = error;
+      }
     };
 
     /**
@@ -228,7 +219,7 @@
        * @returns {LaxPromise}
        */
       error: function (onError) {
-        const fn = util.assignCatchFilters([ApexActionError], onError, this);
+        const fn = util.assignCatchFilters([errors.ApexActionError], onError, this);
         return this.then(undefined, fn);
       },
 
@@ -240,7 +231,7 @@
        * @returns {LaxPromise}
        */
       incomplete: function (onIncomplete) {
-        const fn = util.assignCatchFilters([IncompleteActionError], onIncomplete, this);
+        const fn = util.assignCatchFilters([errors.IncompleteActionError], onIncomplete, this);
         return this.then(undefined, fn);
       },
     };
@@ -413,12 +404,40 @@
         return Object.create(laxAction, props);
       },
 
-      errors: errors,
+      util: {
+        registerError: util.registerError
+      },
 
+      errors: errors,
     };
 
     return lax;
   },
 
+  defineErrors: function () {
+    function ApexActionError(message, entries) {
+      this.name = 'ApexActionError';
+      this.message = message;
+      this.entries = entries;
+      Error.captureStackTrace(this, ApexActionError);
+    }
+    ApexActionError.prototype = Object.create(Error.prototype);
+    ApexActionError.prototype.constructor = ApexActionError;
+
+
+    function IncompleteActionError(message, entries) {
+      this.name = 'IncompleteActionError';
+      this.message = message;
+      this.entries = entries;
+      Error.captureStackTrace(this, IncompleteActionError);
+    }
+    IncompleteActionError.prototype = Object.create(Error.prototype);
+    IncompleteActionError.prototype.constructor = IncompleteActionError;
+
+    return {
+      ApexActionError: ApexActionError,
+      IncompleteActionError: IncompleteActionError
+    };
+  }
 });
 

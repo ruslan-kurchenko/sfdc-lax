@@ -56,4 +56,20 @@ public class LaxExamplesController {
         return 'You are online, switch of an internet connection using devtools to see expected result!';
     }
 
+    @AuraEnabled
+    public static void throwAuraHandledException() {
+        throw new AuraHandledException('AuraHandledException');
+    }
+
+    @AuraEnabled
+    public static void throwDatabaseException() {
+        insert new Account(Id = '123123123', Name = 'ErrorAccount');
+    }
+
+    @AuraEnabled
+    public static void throwIndexOfBoundException() {
+        List<String> strings = new List<String>();
+        strings.get(10);
+    }
+
 }
