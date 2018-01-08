@@ -101,7 +101,7 @@
           }
 
           const errorConstructor = state === 'INCOMPLETE' ? errors.IncompleteActionError : errors.ApexActionError;
-          reject(new errorConstructor(message, responseErrors));
+          reject(new errorConstructor(message, responseErrors, response));
         }
       };
     }
@@ -420,21 +420,23 @@
   },
 
   defineErrors: function () {
-    function ApexActionError(message, entries) {
+    function ApexActionError(message, entries, action) {
       this.name = 'ApexActionError';
       this.message = message;
       this.entries = entries;
-      this.stack = (new Error()).stack
+      this.action = action;
+      this.stack = (new Error()).stack;
     }
     ApexActionError.prototype = Object.create(Error.prototype);
     ApexActionError.prototype.constructor = ApexActionError;
 
 
-    function IncompleteActionError(message, entries) {
+    function IncompleteActionError(message, entries, action) {
       this.name = 'IncompleteActionError';
       this.message = message;
       this.entries = entries;
-      this.stack = (new Error()).stack
+      this.action = action;
+      this.stack = (new Error()).stack;
     }
     IncompleteActionError.prototype = Object.create(Error.prototype);
     IncompleteActionError.prototype.constructor = IncompleteActionError;
