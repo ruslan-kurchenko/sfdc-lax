@@ -1,6 +1,6 @@
 # lax
 
-The service Lightning Component to write a clear asynchronous JavaScript code
+Lax is a Lightning Component to write a clear asynchronous JavaScript code. It helps you to remove the boilerplate code in Lightning Components. Lax combines capabilities to efficiently call Apex with powerful exception handling and list of utility techniques, giving you an ability to write asynchronous code in a modern approach.
 
 ## Features
 
