@@ -6,7 +6,7 @@ The service Lightning Component to write a clear asynchronous JavaScript code
 
 - `lax` gets the context of consumer component
 - Supports the [Promise API](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-    - Set server-side action callback (success and failure)
+    - Set server-side action callback (success, failure, incomplete)
     - Chain server-side actions
     - Perform multiple concurrent server-side actions
 - Construct server-side action using Builder Pattern approach
