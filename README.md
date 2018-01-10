@@ -1,4 +1,4 @@
-![Logo](https://cdn-images-1.medium.com/max/2000/1*rfmeMwKmMo_HqO6dOpe6Tw.png)
+![Logo](https://github.com/ruslan-kurchenko/sfdc-lax/blob/master/assets/logo/logo-1280-676.png)
 
 Lax is a Lightning Component to write a clear asynchronous JavaScript code. It helps you to remove the boilerplate code in Lightning Components. Lax combines capabilities to efficiently call Apex with powerful exception handling and list of utility techniques, giving you an ability to write asynchronous code in a modern approach.
 
