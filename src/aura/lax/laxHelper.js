@@ -245,16 +245,16 @@
      * The object based on builder pattern to call Aura action.
      * It is instantiated to be used by {@link Lax} as a prototype of actual actions.
      * This type of action does not use Promise approach and subsequently can be called as storable.
-     * @typedef {Object} LaxAction
+     * @typedef {Object} LaxActionBuilder
      */
-    const laxAction = {
+    const laxActionBuilder = {
 
       /**
        * Assign the success callback on Aura action
        * @method
-       * @name LaxAction#setThen
+       * @name LaxActionBuilder#setThen
        * @param callback {Function}
-       * @returns {LaxAction}
+       * @returns {LaxActionBuilder}
        */
       setThen: function setThen(callback) {
         this._resolveCallback = callback;
@@ -264,9 +264,9 @@
       /**
        * Assigns the failure callback on Aura action. This function called when the error occurs.
        * @method
-       * @name LaxAction#setCatch
+       * @name LaxActionBuilder#setCatch
        * @param callback {Function}
-       * @returns {LaxAction}
+       * @returns {LaxActionBuilder}
        */
       setCatch: function setCatch(callback) {
         this._rejectCallback = callback;
@@ -276,9 +276,9 @@
       /**
        * Sets parameters for the action.
        * @method
-       * @name LaxAction#setParams
+       * @name LaxActionBuilder#setParams
        * @param params {Object}
-       * @returns {LaxAction}
+       * @returns {LaxActionBuilder}
        */
       setParams: function setParams(params) {
         this._action.setParams(params);
@@ -288,8 +288,8 @@
       /**
        * Marks the action as a {@link https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/controllers_server_storable_actions.htm|Storable}
        * @method
-       * @name LaxAction#setStorable
-       * @returns {LaxAction}
+       * @name LaxActionBuilder#setStorable
+       * @returns {LaxActionBuilder}
        */
       setStorable: function setStorable() {
         this._action.setStorable();
@@ -299,8 +299,8 @@
       /**
        * Marks the action as a {@link https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/controllers_server_background_actions.htm|Background}
        * @method
-       * @name LaxAction#setBackground
-       * @returns {LaxAction}
+       * @name LaxActionBuilder#setBackground
+       * @returns {LaxActionBuilder}
        */
       setBackground: function setBackground() {
         this._action.setBackground();
@@ -311,7 +311,7 @@
        * Enqueues the action. The function do not return the object itself and should be
        * called at the end of the builder chain.
        * @method
-       * @name LaxAction#enqueue
+       * @name LaxActionBuilder#enqueue
        */
       enqueue: function enqueue() {
         this._action.setCallback(this._component, actionRouter(this._resolveCallback, this._rejectCallback));
@@ -384,11 +384,11 @@
       },
 
       /**
-       * Creates the action linked to {@link LaxAction} by the provided name.
+       * Creates the action linked to {@link LaxActionBuilder} by the provided name.
        * @method
        * @name Lax#action
        * @param actionName {String} the name of the action (Apex controller method)
-       * @returns {LaxAction}
+       * @returns {LaxActionBuilder}
        */
       action: function action(actionName) {
         const c = this._component;
@@ -406,7 +406,7 @@
             value: c.get(actionName),
           },
         };
-        return Object.create(laxAction, props);
+        return Object.create(laxActionBuilder, props);
       },
 
       util: {
