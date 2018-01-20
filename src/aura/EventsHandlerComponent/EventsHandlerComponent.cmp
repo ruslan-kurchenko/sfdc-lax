@@ -1,0 +1,14 @@
+<aura:component >
+    <aura:attribute name="handledEventType" type="String" default="The event haven't handled yet"/>
+
+    <aura:handler event="c:AppEvent" action="{!c.onEvent}"/>
+    <aura:handler name="sampleComponentEvent" event="c:CompEvent" action="{!c.onEvent}"/>
+
+    <lightning:card title="Events Handler Component" class="slds-p-horizontal--medium" >
+        Last Event Handled: {!v.handledEventType}
+        <div class="slds-grid slds-grid">
+            <c:CmpEventEmiterComponent />
+            <c:AppEventEmiterComponent />
+        </div>
+    </lightning:card>
+</aura:component>
