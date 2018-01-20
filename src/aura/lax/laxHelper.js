@@ -242,6 +242,107 @@
     };
 
     /**
+     * Creates a unified function to assign it as a callback on the LDS action.
+     * The returned function is a router for the result of the action.
+     * @param resolve {Function} the function called if the action is success
+     * @param reject {Function} the function called if the action is failed
+     * @returns {Function}
+     */
+    function ldsActionRouter(resolve, reject) {
+      return function(result) {
+        if (result.state === 'SUCCESS' || result.state === 'DRAFT') {
+          resolve(result);
+        } else if (result.state === 'ERROR') {
+          let message = 'Unknown error';
+
+          if (result.error && Array.isArray(result.error) && result.error.length > 0) {
+            message = result.error[0].message;
+          }
+
+          reject(new errors.ApexActionError(message, result.error, result));
+        } else if (result.state === 'INCOMPLETE') {
+          const message = 'You are currently offline.';
+          reject(new errors.IncompleteActionError(message, result.error, result));
+        } else {
+          reject(new Error('Unknown action state'));
+        }
+      }
+    }
+
+    /**
+     * The container of the actual Lightning Data Service (LDS). It delegates
+     * actions to LDS and provide and API to chain them. Actions callback functions don't
+     * require <code>$A.getCallback()</code> wrapper.
+     * @typedef {Object} LaxDataService
+     */
+    const laxDataService = {
+
+      /**
+       * The function to save the record that loaded to LDS edit <code>EDIT</code> mode.
+       * It used to create a record and save it or to save the changes to an existing one.
+       * @see https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/data_service_save_record.htm
+       * @name LaxDataService#saveRecord
+       * @returns {LaxPromise}
+       */
+      saveRecord: function () {
+        const self = this;
+        const promise = new Promise(function (resolve, reject) {
+          self._service.saveRecord(ldsActionRouter(resolve, reject));
+        });
+
+        return util.createAuraContextPromise(promise);
+      },
+
+      /**
+       * The function to load a record template to the LDS <code>targetRecord</code> attribute.
+       * It doesn't return a result to callback function.
+       * It simply prepares an empty record and assigns it to the <code>targetRecord</code> attribute.
+       * @param
+       * @name LaxDataService#getNewRecord
+       * @returns {LaxPromise}
+       */
+
+      /**
+       * The function to load a record template to the LDS <code>targetRecord</code> attribute.
+       * It doesn't return a result to callback function.
+       * It simply prepares an empty record and assigns it to the <code>targetRecord</code> attribute.
+       * @param sobjectType {String=} the object API name for the new record.
+       * @param recordTypeId {String=} the 18 character ID of the record type for the new record.
+       * If not specified, the default record type for the object is used, as defined in the user’s profile.
+       * @param skipCache {Boolean=} whether to load the record template from the server instead of the
+       * client-side Lightning Data Service cache. Defaults to false.
+       * @name LaxDataService#getNewRecord
+       * @returns {LaxPromise}
+       */
+      getNewRecord: function (sobjectType, recordTypeId, skipCache) {
+        const self = this;
+        const promise = new Promise(function (resolve, reject) {
+          function getNewRecordCallback () {
+            resolve();
+          }
+
+          self._service.getNewRecord(sobjectType, recordTypeId, skipCache, getNewRecordCallback);
+        });
+
+        return util.createAuraContextPromise(promise);
+      },
+
+      /**
+       * The function to delete a record using LDS.
+       * @name LaxDataService#deleteRecord
+       * @returns {LaxPromise}
+       */
+      deleteRecord: function () {
+        const self = this;
+        const promise = new Promise(function (resolve, reject) {
+          self._service.deleteRecord(ldsActionRouter(resolve, reject));
+        });
+
+        return util.createAuraContextPromise(promise);
+      }
+    };
+
+    /**
      * The object based on builder pattern to call Aura action.
      * It is instantiated to be used by {@link Lax} as a prototype of actual actions.
      * This type of action does not use Promise approach and subsequently can be called as storable.
@@ -340,8 +441,7 @@
        * @name Lax#enqueue
        * @param actionName {String} the name of the action (Apex controller method name)
        * @param params {Object=} the object that contains parameters for the action
-       * @param options {ActionOptions=} the object with list of
-       * options for the action
+       * @param options {ActionOptions=} the object with list of options for the action
        * @returns {LaxPromise}
        */
       enqueue: function enqueue(actionName, params, options) {
@@ -407,6 +507,25 @@
           },
         };
         return Object.create(laxActionBuilder, props);
+      },
+
+      /**
+       * Creates a container of actual Lightning Data Service object.
+       * @param id {String} the aura:id of the <code>force:record</code> (Lightning Data Service) tag
+       * @returns {LaxDataService}
+       */
+      lds: function lds(id) {
+        const service = this._component.find(id);
+        const serviceProp = {
+            _service: {
+                writable: false,
+                configurable: false,
+                enumerable: false,
+                value: service,
+            },
+        };
+
+        return Object.create(laxDataService, serviceProp);
       },
 
       util: {
