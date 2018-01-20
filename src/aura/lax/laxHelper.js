@@ -156,6 +156,10 @@
 
       registerError: function (error) {
         errors[error.name] = error;
+      },
+
+      isApplicationEvent: function (eventName) {
+        return eventName.indexOf('e.') === 0 && eventName.indexOf(':') > 0
       }
     };
 
@@ -422,6 +426,34 @@
     };
 
     /**
+     * The object based on builder pattern to fire Lightning Application or Component events.
+     * @typedef {Object} LaxEventBuilder
+     */
+    const laxEventBuilder = {
+
+      /**
+       * Sets data for the event attributes. A parameter’s name must match the name attribute
+       * of one of the event’s <code>aura:attribute</code> tags.
+       * @name LaxEventBuilder#setParams
+       * @param params {Object} the data of event attributes
+       * @returns {LaxEventBuilder}
+       */
+      setParams: function setParams(params) {
+        this._event.setParams(params);
+        return this;
+      },
+
+      /**
+       * Fires the event.
+       * @name LaxEventBuilder#fire
+       */
+      fire: function fire() {
+        this._event.fire();
+      }
+
+    };
+
+    /**
      * The action main object of the component that is used as a shared prototype across all lax components
      * created in the application. See <code>init</code> function of the laxHelper.js where the lax assigned as prototype.
      * @typedef {Object} Lax
@@ -507,6 +539,25 @@
           },
         };
         return Object.create(laxActionBuilder, props);
+      },
+
+      /**
+       * Creates an object with {LaxEventBuilder} prototype with the context
+       * event by provided name. The function apply Application and Component event name.
+       * @name Lax#event
+       * @param eventName {String} the name of the event
+       * @returns {LaxEventBuilder}
+       */
+      event: function event(eventName) {
+        const props = {
+          _event: {
+            writable: false,
+            configurable: false,
+            enumerable: false,
+            value: util.isApplicationEvent(eventName) ? $A.get(eventName) : this._component.getEvent(eventName)
+          }
+        };
+        return Object.create(laxEventBuilder, props);
       },
 
       /**
