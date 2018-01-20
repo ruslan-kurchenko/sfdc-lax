@@ -1,0 +1,44 @@
+<aura:component implements="flexipage:availableForAllPageTypes,force:hasRecordId">
+
+    <aura:attribute name="record" type="Object"/>
+    <aura:attribute name="simpleRecord" type="Object"/>
+    <aura:attribute name="recordError" type="String"/>
+
+    <force:recordData aura:id="recordHandler"
+                      recordId="{!v.recordId}"
+                      layoutType="FULL"
+                      targetRecord="{!v.record}"
+                      targetFields="{!v.simpleRecord}"
+                      targetError="{!v.recordError}"
+                      mode="EDIT"
+                      recordUpdated="{!c.handleRecordUpdated}" />
+
+    <c:lax context="{!this}" />
+
+    <lightning:card title="Saving Component" class="slds-p-horizontal--medium">
+         <!-- Display a header with details about the record -->
+        <div class="slds-page-header" role="banner">
+            <p class="slds-text-heading_label">Edit Record</p>
+            <h1 class="slds-page-header__title slds-m-right_small
+                slds-truncate slds-align-left">{!v.simpleRecord.Name}</h1>
+        </div>
+    
+        <!-- Display Lightning Data Service errors, if any -->
+        <aura:if isTrue="{!not(empty(v.recordError))}">
+            <div class="recordError">
+                <ui:message title="Error" severity="error" closable="true">
+                    {!v.recordError}
+                </ui:message>
+            </div>
+        </aura:if>
+    
+        <!-- Display an editing form -->
+        <lightning:input aura:id="recordFirstName" name="recordName" label="First Name"
+                      value="{!v.simpleRecord.FirstName}"/>
+        <lightning:input aura:id="recordLastName" name="recordName" label="Last Name"
+                      value="{!v.simpleRecord.LastName}"/>
+    
+         <lightning:button label="Save Record" onclick="{!c.handleSaveRecord}"
+               variant="brand" class="slds-m-top_medium"/>
+    </lightning:card>
+</aura:component>

@@ -1,0 +1,42 @@
+<aura:component implements="flexipage:availableForAllPageTypes">
+
+    <aura:attribute name="newContact" type="Object"/>
+    <aura:attribute name="simpleNewContact" type="Object"/>
+    <aura:attribute name="newContactError" type="String"/>
+   
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+    <c:lax context="{!this}" />
+
+    <force:recordData aura:id="contactRecordCreator" 
+                      layoutType="FULL"
+                      targetRecord="{!v.newContact}"
+                      targetFields="{!v.simpleNewContact}"
+                      targetError="{!v.newContactError}" />
+                
+    <lightning:card title="Creating Component" class="slds-p-horizontal--medium">
+        <div class="slds-page-header" role="banner">
+            <p class="slds-text-heading_label">Create Contact</p>
+        </div>
+    
+        <!-- Display Lightning Data Service errors -->
+        <aura:if isTrue="{!not(empty(v.newContactError))}">
+            <div class="recordError">
+                <ui:message title="Error" severity="error" closable="true">
+                    {!v.newContactError}
+                </ui:message>
+            </div>
+        </aura:if>
+    
+        <!-- Display the new contact form -->
+        <div class="slds-form_stacked">
+            <lightning:input aura:id="contactField" name="firstName" label="First Name"
+                             value="{!v.simpleNewContact.FirstName}" />
+            <lightning:input aura:id="contactField" name="lastname" label="Last Name"
+                          value="{!v.simpleNewContact.LastName}" />
+                          
+            <lightning:button label="Save contact" onclick="{!c.handleSaveContact}"
+                       variant="brand" class="slds-m-top_medium"/>
+       </div>
+   </lightning:card>
+</aura:component>
