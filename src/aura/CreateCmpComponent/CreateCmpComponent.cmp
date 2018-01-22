@@ -1,0 +1,15 @@
+<aura:component >
+    <c:lax context="{!this}" />
+    <aura:handler action="{!c.onInit}" name="init" value="{!this}" />
+
+    <lightning:avatar alternativeText="" src=""
+
+    <lightning:card title="Dynamic Components Creation">
+        <lightning:card aura:id="single" title="Single Component">
+        </lightning:card>
+        <lightning:card aura:id="multiple" title="Multiple Components">
+        </lightning:card>
+
+        <lightning:button onclick="{!c.onInit}" label="ReInit!" />
+    </lightning:card>
+</aura:component>
