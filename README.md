@@ -1,12 +1,12 @@
-# lax
+![Logo](https://github.com/ruslan-kurchenko/sfdc-lax/blob/master/assets/logo/logo-1280-676.png)
 
-The service Lightning Component to write a clear asynchronous JavaScript code
+Lax is a Lightning Component to write a clear asynchronous JavaScript code. It helps you to remove the boilerplate code in Lightning Components. Lax combines capabilities to efficiently call Apex with powerful exception handling and list of utility techniques, giving you an ability to write asynchronous code in a modern approach.
 
 ## Features
 
 - `lax` gets the context of consumer component
 - Supports the [Promise API](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-    - Set server-side action callback (success and failure)
+    - Set server-side action callback (success, failure, incomplete)
     - Chain server-side actions
     - Perform multiple concurrent server-side actions
 - Construct server-side action using Builder Pattern approach

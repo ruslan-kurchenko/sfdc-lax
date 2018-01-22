@@ -106,6 +106,39 @@
       };
     }
 
+    /**
+     * Creates a unified function to be assign as a callback on the component creation action.
+     * @param resolve {Function} the function called if the component creation successfully
+     * @param reject {Function} the function called if the component failed to create
+     * @returns {Function}
+     */
+    function createComponentActionRouter(resolve, reject) {
+      return function (component, status, message) {
+        const result = { status: status };
+        const isMultiple = $A.util.isArray(message);
+        if (isMultiple) {
+          result.components = component;
+          result.statusMessages = message;
+        } else {
+          result.component = component;
+          result.message = message;
+        }
+
+        if (status === 'SUCCESS') {
+          resolve(component);
+        } else {
+          const errorConstructor = status === 'INCOMPLETE' ? errors.IncompleteActionError : errors.CreateComponentError;
+
+          if (isMultiple) {
+            let msg = 'An error occurred while a component creation process.';
+            reject(new errorConstructor(msg, result.statusMessages, result));
+          } else {
+            reject(new errorConstructor(message, null, result));
+          }
+        }
+      }
+    }
+
     const util = {
       /**
        * Create an object and bind it with passed in Promise prototype.
@@ -156,6 +189,10 @@
 
       registerError: function (error) {
         errors[error.name] = error;
+      },
+
+      isApplicationEvent: function (eventName) {
+        return eventName.indexOf('e.') === 0 && eventName.indexOf(':') > 0
       }
     };
 
@@ -167,12 +204,12 @@
      */
     const laxPromise = {
       /**
-       * The function to assign a success callback on an action
+       * Attaches callbacks for the resolution and/or rejection of the Promise.
        * @method
        * @name LaxPromise#then
-       * @param onSuccess {Function|undefined} |
-       * @param onError {Function=}
-       * @returns {LaxPromise}
+       * @param onSuccess {Function|undefined} The callback to execute when the Promise is resolved.
+       * @param onError {Function=} The callback to execute when the Promise is rejected.
+       * @returns {LaxPromise} A Promise for the completion of which ever callback is executed.
        */
       then: function (onSuccess, onError) {
         // TODO: check: is for valid functions?
@@ -186,11 +223,11 @@
       },
 
       /**
-       * The function to assign a failure callback on an action
+       * Attaches a callback for only the rejection of the Promise.
        * @method
        * @name LaxPromise#catch
-       * @param onError {Function}
-       * @returns {LaxPromise}
+       * @param onError {Function} The callback to execute when the Promise is rejected.
+       * @returns {LaxPromise} A Promise for the completion of the callback.
        */
       catch: function (onError) {
         let promise;
@@ -242,19 +279,120 @@
     };
 
     /**
+     * Creates a unified function to assign it as a callback on the LDS action.
+     * The returned function is a router for the result of the action.
+     * @param resolve {Function} the function called if the action is success
+     * @param reject {Function} the function called if the action is failed
+     * @returns {Function}
+     */
+    function ldsActionRouter(resolve, reject) {
+      return function(result) {
+        if (result.state === 'SUCCESS' || result.state === 'DRAFT') {
+          resolve(result);
+        } else if (result.state === 'ERROR') {
+          let message = 'Unknown error';
+
+          if (result.error && Array.isArray(result.error) && result.error.length > 0) {
+            message = result.error[0].message;
+          }
+
+          reject(new errors.LdsActionError(message, result.error, result));
+        } else if (result.state === 'INCOMPLETE') {
+          const message = 'You are currently offline.';
+          reject(new errors.IncompleteActionError(message, result.error, result));
+        } else {
+          reject(new Error('Unknown action state'));
+        }
+      }
+    }
+
+    /**
+     * The container of the actual Lightning Data Service (LDS). It delegates
+     * actions to LDS and provide and API to chain them. Actions callback functions don't
+     * require <code>$A.getCallback()</code> wrapper.
+     * @typedef {Object} LaxDataService
+     */
+    const laxDataService = {
+
+      /**
+       * The function to save the record that loaded to LDS edit <code>EDIT</code> mode.
+       * It used to create a record and save it or to save the changes to an existing one.
+       * @see https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/data_service_save_record.htm
+       * @name LaxDataService#saveRecord
+       * @returns {LaxPromise}
+       */
+      saveRecord: function () {
+        const self = this;
+        const promise = new Promise(function (resolve, reject) {
+          self._service.saveRecord(ldsActionRouter(resolve, reject));
+        });
+
+        return util.createAuraContextPromise(promise);
+      },
+
+      /**
+       * The function to load a record template to the LDS <code>targetRecord</code> attribute.
+       * It doesn't return a result to callback function.
+       * It simply prepares an empty record and assigns it to the <code>targetRecord</code> attribute.
+       * @param
+       * @name LaxDataService#getNewRecord
+       * @returns {LaxPromise}
+       */
+
+      /**
+       * The function to load a record template to the LDS <code>targetRecord</code> attribute.
+       * It doesn't return a result to callback function.
+       * It simply prepares an empty record and assigns it to the <code>targetRecord</code> attribute.
+       * @param sobjectType {String=} the object API name for the new record.
+       * @param recordTypeId {String=} the 18 character ID of the record type for the new record.
+       * If not specified, the default record type for the object is used, as defined in the user’s profile.
+       * @param skipCache {Boolean=} whether to load the record template from the server instead of the
+       * client-side Lightning Data Service cache. Defaults to false.
+       * @name LaxDataService#getNewRecord
+       * @returns {LaxPromise}
+       */
+      getNewRecord: function (sobjectType, recordTypeId, skipCache) {
+        const self = this;
+        const promise = new Promise(function (resolve, reject) {
+          function getNewRecordCallback () {
+            resolve();
+          }
+
+          self._service.getNewRecord(sobjectType, recordTypeId, skipCache, getNewRecordCallback);
+        });
+
+        return util.createAuraContextPromise(promise);
+      },
+
+      /**
+       * The function to delete a record using LDS.
+       * @name LaxDataService#deleteRecord
+       * @returns {LaxPromise}
+       */
+      deleteRecord: function () {
+        const self = this;
+        const promise = new Promise(function (resolve, reject) {
+          self._service.deleteRecord(ldsActionRouter(resolve, reject));
+        });
+
+        return util.createAuraContextPromise(promise);
+      }
+    };
+
+    /**
      * The object based on builder pattern to call Aura action.
      * It is instantiated to be used by {@link Lax} as a prototype of actual actions.
      * This type of action does not use Promise approach and subsequently can be called as storable.
-     * @typedef {Object} LaxAction
+     * @typedef {Object} LaxActionBuilder
      */
-    const laxAction = {
+    const laxActionBuilder = {
 
       /**
        * Assign the success callback on Aura action
        * @method
-       * @name LaxAction#setThen
+       * @name LaxActionBuilder#setThen
        * @param callback {Function}
-       * @returns {LaxAction}
+       * @returns {LaxActionBuilder}
        */
       setThen: function setThen(callback) {
         this._resolveCallback = callback;
@@ -264,9 +402,9 @@
       /**
        * Assigns the failure callback on Aura action. This function called when the error occurs.
        * @method
-       * @name LaxAction#setCatch
+       * @name LaxActionBuilder#setCatch
        * @param callback {Function}
-       * @returns {LaxAction}
+       * @returns {LaxActionBuilder}
        */
       setCatch: function setCatch(callback) {
         this._rejectCallback = callback;
@@ -276,9 +414,9 @@
       /**
        * Sets parameters for the action.
        * @method
-       * @name LaxAction#setParams
+       * @name LaxActionBuilder#setParams
        * @param params {Object}
-       * @returns {LaxAction}
+       * @returns {LaxActionBuilder}
        */
       setParams: function setParams(params) {
         this._action.setParams(params);
@@ -288,8 +426,8 @@
       /**
        * Marks the action as a {@link https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/controllers_server_storable_actions.htm|Storable}
        * @method
-       * @name LaxAction#setStorable
-       * @returns {LaxAction}
+       * @name LaxActionBuilder#setStorable
+       * @returns {LaxActionBuilder}
        */
       setStorable: function setStorable() {
         this._action.setStorable();
@@ -299,8 +437,8 @@
       /**
        * Marks the action as a {@link https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/controllers_server_background_actions.htm|Background}
        * @method
-       * @name LaxAction#setBackground
-       * @returns {LaxAction}
+       * @name LaxActionBuilder#setBackground
+       * @returns {LaxActionBuilder}
        */
       setBackground: function setBackground() {
         this._action.setBackground();
@@ -311,12 +449,40 @@
        * Enqueues the action. The function do not return the object itself and should be
        * called at the end of the builder chain.
        * @method
-       * @name LaxAction#enqueue
+       * @name LaxActionBuilder#enqueue
        */
       enqueue: function enqueue() {
         this._action.setCallback(this._component, actionRouter(this._resolveCallback, this._rejectCallback));
         $A.enqueueAction(this._action);
       },
+
+    };
+
+    /**
+     * The object based on builder pattern to fire Lightning Application or Component events.
+     * @typedef {Object} LaxEventBuilder
+     */
+    const laxEventBuilder = {
+
+      /**
+       * Sets data for the event attributes. A parameter’s name must match the name attribute
+       * of one of the event’s <code>aura:attribute</code> tags.
+       * @name LaxEventBuilder#setParams
+       * @param params {Object} the data of event attributes
+       * @returns {LaxEventBuilder}
+       */
+      setParams: function setParams(params) {
+        this._event.setParams(params);
+        return this;
+      },
+
+      /**
+       * Fires the event.
+       * @name LaxEventBuilder#fire
+       */
+      fire: function fire() {
+        this._event.fire();
+      }
 
     };
 
@@ -340,8 +506,7 @@
        * @name Lax#enqueue
        * @param actionName {String} the name of the action (Apex controller method name)
        * @param params {Object=} the object that contains parameters for the action
-       * @param options {ActionOptions=} the object with list of
-       * options for the action
+       * @param options {ActionOptions=} the object with list of options for the action
        * @returns {LaxPromise}
        */
       enqueue: function enqueue(actionName, params, options) {
@@ -384,11 +549,11 @@
       },
 
       /**
-       * Creates the action linked to {@link LaxAction} by the provided name.
+       * Creates the action linked to {@link LaxActionBuilder} by the provided name.
        * @method
        * @name Lax#action
        * @param actionName {String} the name of the action (Apex controller method)
-       * @returns {LaxAction}
+       * @returns {LaxActionBuilder}
        */
       action: function action(actionName) {
         const c = this._component;
@@ -406,7 +571,101 @@
             value: c.get(actionName),
           },
         };
-        return Object.create(laxAction, props);
+        return Object.create(laxActionBuilder, props);
+      },
+
+      /**
+       * Creates an object with {LaxEventBuilder} prototype with the context
+       * event by provided name. The function apply Application and Component event name.
+       * @method
+       * @name Lax#event
+       * @param eventName {String} the name of the event
+       * @returns {LaxEventBuilder}
+       */
+      event: function event(eventName) {
+        const props = {
+          _event: {
+            writable: false,
+            configurable: false,
+            enumerable: false,
+            value: util.isApplicationEvent(eventName) ? $A.get(eventName) : this._component.getEvent(eventName)
+          }
+        };
+        return Object.create(laxEventBuilder, props);
+      },
+
+      /**
+       * Creates a container of actual Lightning Data Service object.
+       * @method
+       * @name Lax#lds
+       * @param id {String} the aura:id of the <code>force:record</code> (Lightning Data Service) tag
+       * @returns {LaxDataService}
+       */
+      lds: function lds(id) {
+        const service = this._component.find(id);
+        const serviceProp = {
+            _service: {
+                writable: false,
+                configurable: false,
+                enumerable: false,
+                value: service,
+            },
+        };
+
+        return Object.create(laxDataService, serviceProp);
+      },
+
+      /**
+       * Create a component from a type and a set of attributes.
+       * It accepts the name of a type of component, a map of attributes,
+       * and returns {LaxPromise} to assign a callback function to notify caller.
+       * @method
+       * @name Lax#createComponent
+       * @param {String} type The type of component to create, e.g. "ui:button".
+       * @param {Object} attributes A map of attributes to send to the component. These take the same form as on the markup,
+       * including events <code>{"press":component.getReference("c.handlePress")}</code>, and id <code>{"aura:id":"myComponentId"}</code>.
+       * @example
+       * lax.createComponent("aura:text",{value:'Hello World'})
+       *   .then(function(auraTextComponent){
+       *        // auraTextComponent - is an instance of aura:text containing the value Hello World
+       *   });
+       * @returns {LaxPromise}
+       */
+      createComponent: function createComponent(type, attributes) {
+        const promise = new Promise(function (resolve, reject) {
+          $A.createComponent(type, attributes, createComponentActionRouter(resolve, reject));
+        });
+
+        return util.createAuraContextPromise(promise);
+      },
+
+      /**
+       * Create an array of components from a list of types and attributes.
+       * It accepts a list of component names and attribute maps, and returns
+       * {LaxPromise} to assign a callback function to notify caller.
+       * @method
+       * @name Lax#createComponents
+       * @param {Array} components The list of components to create, e.g. <code>["ui:button",{"press":component.getReference("c.handlePress")}]</code>
+       * @example
+       * lax.createComponents([
+       *      ["aura:text",{value:'Hello'}],
+       *      ["ui:button",{label:'Button'}],
+       *      ["aura:text",{value:'World'}]
+       *  ])
+       *  .then(function(components) {
+       *      // components - is an array of 3 components
+       *      // 0 - Text Component containing Hello
+       *      // 1 - Button Component with label Button
+       *      // 2 - Text component containing World
+       *  });
+       *  @return {LaxPromise}
+       */
+      createComponents: function createComponents(components) {
+        const promise = new Promise(function (resolve, reject) {
+          $A.createComponents(components, createComponentActionRouter(resolve, reject));
+        });
+
+        return util.createAuraContextPromise(promise);
       },
 
       util: {
@@ -441,9 +700,31 @@
     IncompleteActionError.prototype = Object.create(Error.prototype);
     IncompleteActionError.prototype.constructor = IncompleteActionError;
 
+    function LdsActionError(message, entries, action) {
+      this.name = 'LdsActionError';
+      this.message = message;
+      this.entries = entries;
+      this.action = action;
+      this.stack = (new Error()).stack;
+    }
+    LdsActionError.prototype = Object.create(Error.prototype);
+    LdsActionError.prototype.constructor = LdsActionError;
+
+    function CreateComponentError(message, entries, action) {
+      this.name = 'CreateComponentError';
+      this.message = message;
+      this.entries = entries;
+      this.action = action;
+      this.stack = (new Error()).stack;
+    }
+    CreateComponentError.prototype = Object.create(Error.prototype);
+    CreateComponentError.prototype.constructor = CreateComponentError;
+
     return {
       ApexActionError: ApexActionError,
-      IncompleteActionError: IncompleteActionError
+      IncompleteActionError: IncompleteActionError,
+      LdsActionError: LdsActionError,
+      CreateComponentError: CreateComponentError
     };
   }
 });
