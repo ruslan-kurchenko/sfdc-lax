@@ -12,5 +12,6 @@
         <c:ExceptionComponent />
         <c:IncompleteComponent />
         <c:EventsHandlerComponent />
+        <c:CreateCmpComponent />
     </div>
 </aura:application>
