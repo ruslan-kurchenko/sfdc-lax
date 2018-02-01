@@ -22,7 +22,16 @@
  * SOFTWARE.
  */
 
+/**
+ * The controller of Lax Aura Component
+ * @namespace LaxController
+ */
 ({
+  /**
+   * Initialization function called every time Lax Aura Component instantiated
+   * @memberof LaxController#
+   * @param component {Object} - the lax component object
+   */
   onInit: function onInit(component, event, helper) {
     helper.init(component, event);
   },
