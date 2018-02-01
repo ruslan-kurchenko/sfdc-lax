@@ -662,7 +662,7 @@
        * It accepts the name of a type of component, a map of attributes,
        * and returns {LaxPromise} to assign a callback function to notify caller.
        * @param {String} type The type of component to create, e.g. "ui:button".
-       * @param {Object} attributes A map of attributes to send to the component. These take the same form as on the markup,
+       * @param {Object=} attributes A map of attributes to send to the component. These take the same form as on the markup,
        * including events <code>{"press":component.getReference("c.handlePress")}</code>, and id <code>{"aura:id":"myComponentId"}</code>.
        * @example
        * lax.createComponent("aura:text",{value:'Hello World'})
