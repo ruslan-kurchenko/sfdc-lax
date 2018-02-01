@@ -1,0 +1,1387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Lax - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Lax.html">Lax</a><ul class='methods'><li data-type='method'><a href="Lax.html#action">action</a></li><li data-type='method'><a href="Lax.html#createComponent">createComponent</a></li><li data-type='method'><a href="Lax.html#createComponents">createComponents</a></li><li data-type='method'><a href="Lax.html#enqueue">enqueue</a></li><li data-type='method'><a href="Lax.html#enqueueAll">enqueueAll</a></li><li data-type='method'><a href="Lax.html#event">event</a></li><li data-type='method'><a href="Lax.html#lds">lds</a></li></ul></li><li><a href="LaxActionBuilder.html">LaxActionBuilder</a><ul class='methods'><li data-type='method'><a href="LaxActionBuilder.html#enqueue">enqueue</a></li><li data-type='method'><a href="LaxActionBuilder.html#setBackground">setBackground</a></li><li data-type='method'><a href="LaxActionBuilder.html#setCatch">setCatch</a></li><li data-type='method'><a href="LaxActionBuilder.html#setParams">setParams</a></li><li data-type='method'><a href="LaxActionBuilder.html#setStorable">setStorable</a></li><li data-type='method'><a href="LaxActionBuilder.html#setThen">setThen</a></li></ul></li><li><a href="LaxDataService.html">LaxDataService</a><ul class='methods'><li data-type='method'><a href="LaxDataService.html#deleteRecord">deleteRecord</a></li><li data-type='method'><a href="LaxDataService.html#getNewRecord">getNewRecord</a></li><li data-type='method'><a href="LaxDataService.html#saveRecord">saveRecord</a></li></ul></li><li><a href="LaxEventBuilder.html">LaxEventBuilder</a><ul class='methods'><li data-type='method'><a href="LaxEventBuilder.html#fire">fire</a></li><li data-type='method'><a href="LaxEventBuilder.html#setParams">setParams</a></li></ul></li><li><a href="LaxPromise.html">LaxPromise</a><ul class='methods'><li data-type='method'><a href="LaxPromise.html#catch">catch</a></li><li data-type='method'><a href="LaxPromise.html#error">error</a></li><li data-type='method'><a href="LaxPromise.html#finally">finally</a></li><li data-type='method'><a href="LaxPromise.html#incomplete">incomplete</a></li><li data-type='method'><a href="LaxPromise.html#then">then</a></li></ul></li></ul><h3>Namespaces</h3><ul><li><a href="LaxController.html">LaxController</a><ul class='methods'><li data-type='method'><a href="LaxController.html#onInit">onInit</a></li></ul></li><li><a href="LaxHelper.html">LaxHelper</a><ul class='methods'><li data-type='method'><a href="LaxHelper.html#createLax">createLax</a></li><li data-type='method'><a href="LaxHelper.html#getLax">getLax</a></li><li data-type='method'><a href="LaxHelper.html#init">init</a></li></ul></li></ul><h3><a href="global.html">Global</a></h3>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">Lax</h1>
+    
+
+    
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>
+        Lax
+        </h2>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+
+    
+
+    <h4 class="name" id="Lax"><span class="type-signature"></span>new Lax<span class="signature">()</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="laxHelper.js.html">laxHelper.js</a>, <a href="laxHelper.js.html#line513">line 513</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    The action main object of the component that is used as a shared prototype across all lax components
+created in the application. See <code>init</code> function of the laxHelper.js where the lax assigned as prototype.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    </div>
+
+    
+
+    
+
+    
+
+     
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    <h4 class="name" id="action"><span class="type-signature"></span>action<span class="signature">(actionName)</span><span class="type-signature"> &rarr; {<a href="LaxActionBuilder.html">LaxActionBuilder</a>}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="laxHelper.js.html">laxHelper.js</a>, <a href="laxHelper.js.html#line604">line 604</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    Creates the action linked to <a href="LaxActionBuilder.html">LaxActionBuilder</a> by the provided name.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>component.lax
+ .action('c.getContact')
+ .setStorable()
+ .setParams({ id: recordId })
+ .setThen(contact => {
+   component.set('v.record', contact)
+ })
+ .setCatch(error => {
+   console.error(error);
+ })
+ .enqueue();</code></pre>
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>actionName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the name of the action (Apex controller method)</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="LaxActionBuilder.html">LaxActionBuilder</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="createComponent"><span class="type-signature"></span>createComponent<span class="signature">(type, attributes<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {<a href="LaxPromise.html">LaxPromise</a>}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="laxHelper.js.html">laxHelper.js</a>, <a href="laxHelper.js.html#line674">line 674</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    Create a component from a type and a set of attributes.
+It accepts the name of a type of component, a map of attributes,
+and returns {LaxPromise} to assign a callback function to notify caller.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>lax.createComponent("aura:text",{value:'Hello World'})
+  .then(function(auraTextComponent){
+       // auraTextComponent - is an instance of aura:text containing the value Hello World
+  });</code></pre>
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>type</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">The type of component to create, e.g. "ui:button".</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>attributes</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">A map of attributes to send to the component. These take the same form as on the markup,
+including events <code>{"press":component.getReference("c.handlePress")}</code>, and id <code>{"aura:id":"myComponentId"}</code>.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="LaxPromise.html">LaxPromise</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="createComponents"><span class="type-signature"></span>createComponents<span class="signature">(components)</span><span class="type-signature"> &rarr; {<a href="LaxPromise.html">LaxPromise</a>}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="laxHelper.js.html">laxHelper.js</a>, <a href="laxHelper.js.html#line701">line 701</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    Create an array of components from a list of types and attributes.
+It accepts a list of component names and attribute maps, and returns
+{LaxPromise} to assign a callback function to notify caller.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>lax.createComponents([
+     ["aura:text",{value:'Hello'}],
+     ["ui:button",{label:'Button'}],
+     ["aura:text",{value:'World'}]
+ ])
+ .then(function(components) {
+     // components - is an array of 3 components
+     // 0 - Text Component containing Hello
+     // 1 - Button Component with label Button
+     // 2 - Text component containing World
+ });
+ </code></pre>
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>components</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The list of components to create, e.g. <code>["ui:button",{"press":component.getReference("c.handlePress")}]</code></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="LaxPromise.html">LaxPromise</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="enqueue"><span class="type-signature"></span>enqueue<span class="signature">(actionName, params, options)</span><span class="type-signature"> &rarr; {<a href="LaxPromise.html">LaxPromise</a>}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="laxHelper.js.html">laxHelper.js</a>, <a href="laxHelper.js.html#line537">line 537</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    Enqueues the action by the name and with passed in params and options.
+The function returns Promise, subsequently client can chain the actions
+by assigning <code>then</code> callbacks or handle the error by <code>catch</code> callback.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>component.lax.enqueue('c.getContact', { id: recordId }, { background: true })
+  .then(contact => {
+    component.set('v.record', contact);
+  });</code></pre>
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>actionName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the name of the action (Apex controller method name)</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>params</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">[Object] the object that contains parameters for the action</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">[ActionOptions] the object with list of options for the action</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="LaxPromise.html">LaxPromise</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="enqueueAll"><span class="type-signature"></span>enqueueAll<span class="signature">(actions)</span><span class="type-signature"> &rarr; {<a href="LaxPromise.html">LaxPromise</a>}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="laxHelper.js.html">laxHelper.js</a>, <a href="laxHelper.js.html#line578">line 578</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    Enqueues the list of actions parallel.
+The function return Promise that subsequently can be used to chain callback.
+The success callback assigned on the Promise called after all actions ready and an error have not thrown.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>component.lax.enqueueAll([
+  // { name : '...', params: {...}, options: {...} }
+  { name: 'c.getContacts' },
+  { name: 'c.getAccounts' },
+  { name: 'c.getOpportunities' }
+])
+.then(results => {
+  // results: [ [contacts], [accounts], [opportunities] ]
+  const contacts = results[0];
+  const accounts = results[1];
+  const opportunities = results[2];
+});</code></pre>
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>actions</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;<a href="global.html#ActionProperties">ActionProperties</a>></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="LaxPromise.html">LaxPromise</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="event"><span class="type-signature"></span>event<span class="signature">(eventName)</span><span class="type-signature"> &rarr; {<a href="LaxEventBuilder.html">LaxEventBuilder</a>}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="laxHelper.js.html">laxHelper.js</a>, <a href="laxHelper.js.html#line629">line 629</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    Creates an object with {LaxEventBuilder} prototype with the context
+event by provided name. The function apply Application and Component event name.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>eventName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the name of the event</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="LaxEventBuilder.html">LaxEventBuilder</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="lds"><span class="type-signature"></span>lds<span class="signature">(id)</span><span class="type-signature"> &rarr; {<a href="LaxDataService.html">LaxDataService</a>}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="laxHelper.js.html">laxHelper.js</a>, <a href="laxHelper.js.html#line646">line 646</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    Creates a container of actual Lightning Data Service object.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>id</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the aura:id of the <code>force:record</code> (Lightning Data Service) tag</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="LaxDataService.html">LaxDataService</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Feb 01 2018 13:28:24 GMT+0200 (EET) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

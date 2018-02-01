@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Home - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Lax.html">Lax</a><ul class='methods'><li data-type='method'><a href="Lax.html#action">action</a></li><li data-type='method'><a href="Lax.html#createComponent">createComponent</a></li><li data-type='method'><a href="Lax.html#createComponents">createComponents</a></li><li data-type='method'><a href="Lax.html#enqueue">enqueue</a></li><li data-type='method'><a href="Lax.html#enqueueAll">enqueueAll</a></li><li data-type='method'><a href="Lax.html#event">event</a></li><li data-type='method'><a href="Lax.html#lds">lds</a></li></ul></li><li><a href="LaxActionBuilder.html">LaxActionBuilder</a><ul class='methods'><li data-type='method'><a href="LaxActionBuilder.html#enqueue">enqueue</a></li><li data-type='method'><a href="LaxActionBuilder.html#setBackground">setBackground</a></li><li data-type='method'><a href="LaxActionBuilder.html#setCatch">setCatch</a></li><li data-type='method'><a href="LaxActionBuilder.html#setParams">setParams</a></li><li data-type='method'><a href="LaxActionBuilder.html#setStorable">setStorable</a></li><li data-type='method'><a href="LaxActionBuilder.html#setThen">setThen</a></li></ul></li><li><a href="LaxDataService.html">LaxDataService</a><ul class='methods'><li data-type='method'><a href="LaxDataService.html#deleteRecord">deleteRecord</a></li><li data-type='method'><a href="LaxDataService.html#getNewRecord">getNewRecord</a></li><li data-type='method'><a href="LaxDataService.html#saveRecord">saveRecord</a></li></ul></li><li><a href="LaxEventBuilder.html">LaxEventBuilder</a><ul class='methods'><li data-type='method'><a href="LaxEventBuilder.html#fire">fire</a></li><li data-type='method'><a href="LaxEventBuilder.html#setParams">setParams</a></li></ul></li><li><a href="LaxPromise.html">LaxPromise</a><ul class='methods'><li data-type='method'><a href="LaxPromise.html#catch">catch</a></li><li data-type='method'><a href="LaxPromise.html#error">error</a></li><li data-type='method'><a href="LaxPromise.html#finally">finally</a></li><li data-type='method'><a href="LaxPromise.html#incomplete">incomplete</a></li><li data-type='method'><a href="LaxPromise.html#then">then</a></li></ul></li></ul><h3>Namespaces</h3><ul><li><a href="LaxController.html">LaxController</a><ul class='methods'><li data-type='method'><a href="LaxController.html#onInit">onInit</a></li></ul></li><li><a href="LaxHelper.html">LaxHelper</a><ul class='methods'><li data-type='method'><a href="LaxHelper.html#createLax">createLax</a></li><li data-type='method'><a href="LaxHelper.html#getLax">getLax</a></li><li data-type='method'><a href="LaxHelper.html#init">init</a></li></ul></li></ul><h3><a href="global.html">Global</a></h3>
+</nav>
+
+<div id="main">
+    
+
+    
+
+
+
+    
+
+
+
+
+
+
+
+
+
+    
+
+
+    <section class="readme">
+        <article><p><img src="https://github.com/ruslan-kurchenko/sfdc-lax/blob/master/assets/logo/logo-1280-676.png?raw=true" alt="Logo"></p>
+<p>Lax is a Lightning Component to write a clear asynchronous JavaScript code. It helps you to remove the boilerplate code in Lightning Components. Lax combines capabilities to efficiently call Apex with powerful exception handling and list of utility techniques, giving you an ability to write asynchronous code in a modern approach.</p>
+<h2>Features</h2><ul>
+<li><code>lax</code> gets the context of consumer component</li>
+<li>Supports the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise API</a><ul>
+<li>Set server-side action callback (success, failure, incomplete)</li>
+<li>Chain server-side actions</li>
+<li>Perform multiple concurrent server-side actions</li>
+</ul>
+</li>
+<li>Construct server-side action using Builder Pattern approach</li>
+<li>Automatically wraps callback by <code>$A.getCallback()</code></li>
+<li>Use <code>lax</code> in consumer's component <a href="https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/ref_aura_valueInit.htm">aura:valueInit</a> event handler</li>
+</ul>
+<h2>Installing</h2><p>Click on the button below to deploy the component to the org</p>
+<p><a href="https://githubsfdeploy.herokuapp.com/app/githubdeploy/ruslan-kurchenko/sfdc-lax"><img src="https://raw.githubusercontent.com/afawcett/githubsfdeploy/master/src/main/webapp/resources/img/deploy.png" alt="Deploy to Salesforce"></a></p>
+<h2>Usage</h2><p>Define <code>lax</code> component in a custom component markup:</p>
+<pre class="prettyprint source lang-html"><code>&lt;!-- ContactsComponent.cmp -->
+&lt;aura:component controller=&quot;LaxExamplesController&quot;>
+    &lt;!-- Define lax component and pass consumer's component object as a context attribute (required) -->
+    &lt;c:lax context=&quot;{!this}&quot; />
+
+    &lt;aura:attribute name=&quot;records&quot; type=&quot;Contact[]&quot; access=&quot;private&quot;/>
+    &lt;aura:handler name=&quot;init&quot; action=&quot;{!c.onInit}&quot; value=&quot;{!this}&quot; />
+&lt;/aura:component></code></pre><p>Enqueue an action in component's <a href="https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/ref_aura_valueInit.htm">aura:valueInit</a> event handler function to get initial data:</p>
+<pre class="prettyprint source lang-JavaScript"><code>// ContactsComponentController.js
+({
+    onInit: function (component, event, helper) {
+        // equeue getContacts server-side action and set the callback
+        component.lax.enqueue('c.getContacts').then(contacts => {
+            // $A.getCallback is not required. lax does it automatically
+            component.set('v.records', contacts);
+        });
+    }
+});</code></pre><h6>NOTE</h6><ul>
+<li><code>lax</code> <a href="https://github.com/ruslan-kurchenko/sfdc-lax/blob/master/src/aura/lax/laxHelper.js#L57">automatically defines</a> a property on the consumer's component (<a href="https://github.com/ruslan-kurchenko/sfdc-lax/blob/master/src/aura/lax/laxHelper.js#L35">context</a>) object</li>
+<li><code>lax</code> is ready to use in consumer's component <a href="https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/ref_aura_valueInit.htm">aura:valueInit</a> event handler</li>
+<li>Every consumer component has its own <code>lax</code> object. Every <code>lax</code> object <a href="https://github.com/ruslan-kurchenko/sfdc-lax/blob/master/src/aura/lax/laxHelper.js#L47">inherits</a> methods from <a href="https://github.com/ruslan-kurchenko/sfdc-lax/blob/master/src/aura/lax/laxHelper.js#L233">grand parent</a></li>
+</ul>
+<h2>Examples</h2><p>Actions can be enqueued by passing the relevant parameters and options.</p>
+<h5><code>lax.enqueue(name[, params[, options]]).then(callback)</code> - call action with parameters, options and simple callback</h5><pre class="prettyprint source lang-javascript"><code>component.lax.enqueue('c.getContact', { id: recordId }, { background: true })
+    .then(contact => {
+        component.set('v.record', contact);
+    });</code></pre><h6>NOTE</h6><ul>
+<li><code>component</code> - A reference from a list of parameters that every client-side controller function has</li>
+<li><code>params</code> - An object with list of parameters <em>(optional)</em></li>
+<li><code>options</code> - An object with list of options that can be applied to the action <em>(optional)</em>:<ul>
+<li><code>background</code> - <a href="https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/controllers_server_background_actions.htm">to sent action separately from any foreground actions</a></li>
+<li><code>abortable</code> - <a href="https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/controllers_server_abortable_actions.htm">to make action potentially abortable while it's queued to be sent to the server</a></li>
+<li><code>storable</code> - <a href="https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/controllers_server_storable_actions.htm">to quickly show action cached data from client-side storage without waiting for a server trip</a>. 
+It is not recommended to use with <a href="https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/js_promises.htm">Promise API by Salesforce</a>. Use <a href="https://github.com/ruslan-kurchenko/sfdc-lax/blob/master/README.md#laxactionname---create-and-return-laxaction-builder">lax.action</a> instead</li>
+</ul>
+</li>
+<li><code>.enqueue()</code> - The function returns <a href="https://github.com/ruslan-kurchenko/sfdc-lax/blob/master/src/aura/lax/laxHelper.js#L101">LaxPromise</a> object which inherited from <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>. It overrides <code>.then()</code> and <code>.catch()</code> function to automatically wrapper callback using <code>$A.getCallback()</code>.</li>
+</ul>
+<h5><code>lax.enqueue(name[, params[, options]]).then(callback).catch(callback)</code> - handle errors thrown by the server</h5><pre class="prettyprint source lang-javascript"><code>component.lax.enqueue('c.save', { record: record })
+    .then(id => {
+        component.set('v.record.id', id);
+    })
+    .catch(errors => {
+        console.error(errors);
+    });</code></pre><h5><code>lax.enqueue(name[, params[, options]]).then(callback).then(callback)</code> - performing multiple <em>chained</em> actions</h5><pre class="prettyprint source lang-javascript"><code>component.lax.enqueue('c.getParentValue')
+    .then(parentValue => {
+        component.set('v.parentValue', parentValue);
+        return component.lax.enqueue('c.getDependentValue', { parentValue: parentValue });
+    })
+    .then(dependentValue => {
+        component.set('v.dependentValue', dependentValue);
+    });</code></pre><h5><code>lax.enqueueAll(actions).then(callback)</code> - performing multiple <em>concurrent</em> actions</h5><pre class="prettyprint source lang-javascript"><code>component.lax.enqueueAll([
+    // { name : '...', params: {...}, options: {...} }
+    { name: 'c.getContacts' }, 
+    { name: 'c.getAccounts' },
+    { name: 'c.getOpportunities' }
+])
+.then(results => {
+    // results: [ [contacts], [accounts], [opportunities] ]
+    const contacts = results[0];
+    const accounts = results[1];
+    const opportunities = results[2];
+});</code></pre><h6>NOTE</h6><ul>
+<li><code>actions</code> - The array of actions to enqueue concurrently:<ul>
+<li><code>name</code> - the name of an action</li>
+<li><code>params</code> - an object with list of parameters <em>(optional)</em></li>
+<li><code>options</code> - an object with list of options that can be applied to the action <em>(optional)</em></li>
+</ul>
+</li>
+<li>The success callback will call when all enqueued actions be back from the server</li>
+<li><code>results</code> - The list of values returned from enqueued actions </li>
+</ul>
+<h5><code>lax.action(name)</code> - create and return <a href="https://github.com/ruslan-kurchenko/sfdc-lax/blob/master/src/aura/lax/laxHelper.js#L153">LaxAction</a> builder</h5><pre class="prettyprint source lang-javascript"><code>component.lax
+    .action('c.getContact')
+    .setStorable()
+    .setParams({ id: recordId })
+    .setThen(contact => {
+        component.set('v.record', contact)
+    })
+    .setCatch(error => {
+        console.error(error);
+    })
+    .enqueue();</code></pre><h6>NOTE</h6><ul>
+<li><code>LaxAction</code> is an object with the list of functions to construct a server-side action</li>
+<li>The approach is useful for <a href="https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/controllers_server_storable_actions.htm">Storable</a> actions, because <code>LaxAction</code> does not use <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise API</a></li>
+<li>Actions can't be chained or called concurrently using <code>LaxAction</code> builder approach</li>
+<li>The list of function available on <code>LaxAction</code>:<ul>
+<li><code>setParams(params)</code> - set an object with list of parameters</li>
+<li><code>setThen(callback)</code> - set success callback function</li>
+<li><code>setCatch(callback)</code> - set failure callback function to handler server-side errors</li>
+<li><code>enqueue()</code> - enqueue constructed action. The only function <code>LaxAction</code> that return <code>undefined</code></li>
+<li><code>setStorable()</code> - set an action as a <a href="https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/controllers_server_storable_actions.htm">Storable</a></li>
+<li><code>setBackground()</code> - set an action as a <a href="https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/controllers_server_background_actions.htm">Background</a></li>
+</ul>
+</li>
+</ul>
+<h5><code>lax.lds(id)</code> - create and return LaxDataService to execute Lightning Data Service (LDS) actions based on Promise API</h5><pre class="prettyprint source lang-javascript"><code>component.lax.lds('serviceAuraId');</code></pre><h5><code>lax.lds(id).getNewRecord(sobjectType[, recordTypeId[, skipCache]])</code> - the function to load a record template to the LDS <code>targetRecord</code> attribute</h5><pre class="prettyprint source lang-javascript"><code>component.lax.lds('contactRecordCreator')
+  .getNewRecord('Contact')
+  .then(() => {
+    const rec = component.get(&quot;v.newContact&quot;);
+    const error = component.get(&quot;v.newContactError&quot;);
+
+    if (error || (rec === null)) {
+      console.log(&quot;Error initializing record template: &quot; + error);
+    }
+  });</code></pre><h5><code>lax.lds(id).saveRecord()</code> - the function to save the record that loaded to LDS in the edit <code>EDIT</code> mode</h5><pre class="prettyprint source lang-javascript"><code>component.lax.lds('recordHandler')
+  .saveRecord()
+  .then(result => {
+    // handle &quot;SUCCESS&quot; or &quot;DRAFT&quot; state
+  })
+  .error(e => {
+    // handle &quot;ERROR&quot; state
+  })
+  .incomplete(e => {
+    // handle &quot;INCOMPLETE&quot; state
+  })</code></pre><h5><code>lax.lds(id).deleteRecord()</code> - the function to delete a record using LDS</h5><pre class="prettyprint source lang-javascript"><code>component.lax.lds('recordHandler')
+  .deleteRecord()
+  .then(result => {
+    // handle &quot;SUCCESS&quot; or &quot;DRAFT&quot; state
+  })
+  .catch(e => {
+    // handle &quot;ERROR&quot; or &quot;INCOMPLETE&quot; state. 
+    // or you can use divided handlers: .error(), .incomplete()
+  })</code></pre><h5><code>lax.event(eventName)</code> - creates an object with <code>LaxEventBuilder</code> prototype and the context event by provided name</h5><pre class="prettyprint source lang-javascript"><code>// Fire Component Event:
+component.lax.event('sampleComponentEvent')
+  .setParams({payload: { type: 'COMPONENT'} })
+  .fire();
+
+// Fire Application Event:
+component.lax.event('e.c:AppEvent')
+  .setParams({payload: { type: 'APPLICATION'} })
+  .fire();</code></pre><h5><code>lax.createComponent(type[, attributes])</code> - creates a component from a type and a set of attributes</h5><pre class="prettyprint source lang-javascript"><code>component.lax.createComponent('aura:text', { value: 'Single Component Creation' })
+  .then(result => {
+    // result has a property &quot;component&quot; with created component
+    single.set('v.body', result.component);
+  })
+  .catch(e => {
+    // handle &quot;ERROR&quot; or &quot;INCOMPLETE&quot; state
+  });</code></pre><h5><code>lax.createComponent(type[, attributes])</code> - creates an array of components from a list of types and attributes</h5><pre class="prettyprint source lang-javascript"><code>lax.createComponents([
+    ['aura:text', { value: 'Multiple Component Creation #1'}],
+    ['aura:text', { value: 'Multiple Component Creation #2'}],
+    ['aura:text', { value: 'Multiple Component Creation #3'}]
+  ])
+  .then(result => {
+    // result has a property &quot;components&quot; with list of created components
+    multiple.set('v.body', result.components);
+  })
+  .incomplete(e => {
+    // handle &quot;INCOMPLETE&quot; state
+  })
+  .error(e => {
+    // handle &quot;ERROR&quot; state
+  });</code></pre><h2>License</h2><p><a href="https://github.com/ruslan-kurchenko/sfdc-lax/blob/master/docs/LICENSE">MIT</a></p></article>
+    </section>
+
+
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Feb 01 2018 13:28:24 GMT+0200 (EET) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>
