@@ -9,7 +9,10 @@ Lax is a Lightning Component to write a clear asynchronous JavaScript code. It h
     - Set server-side action callback (success, failure, incomplete)
     - Chain server-side actions
     - Perform multiple concurrent server-side actions
-- Construct server-side action using Builder Pattern approach
+    - Call Lightning Data Service actions (create/save/delete)
+    - Dynamically create components
+- Construct and enqueue server-side action using Builder Pattern approach
+- Construct and fire Application or Component event using Builder Pattern approach
 - Automatically wraps callback by `$A.getCallback()`
 - Use `lax` in consumer's component [aura:valueInit](https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/ref_aura_valueInit.htm) event handler
 
@@ -49,6 +52,9 @@ Enqueue an action in component's [aura:valueInit](https://developer.salesforce.c
 - `lax` [automatically defines](https://github.com/ruslan-kurchenko/sfdc-lax/blob/master/src/aura/lax/laxHelper.js#L57) a property on the consumer's component ([context](https://github.com/ruslan-kurchenko/sfdc-lax/blob/master/src/aura/lax/laxHelper.js#L35)) object
 - `lax` is ready to use in consumer's component [aura:valueInit](https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/ref_aura_valueInit.htm) event handler
 - Every consumer component has its own `lax` object. Every `lax` object [inherits](https://github.com/ruslan-kurchenko/sfdc-lax/blob/master/src/aura/lax/laxHelper.js#L47) methods from [grand parent](https://github.com/ruslan-kurchenko/sfdc-lax/blob/master/src/aura/lax/laxHelper.js#L233)
+
+## API Reference
+Navigate to component [API Reference](https://ruslan-kurchenko.github.io/sfdc-lax/) documentation to see full list of available functions and capabilities
 
 ## Examples
 
