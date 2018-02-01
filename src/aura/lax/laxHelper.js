@@ -22,16 +22,18 @@
  * SOFTWARE.
  */
 
-({
+/**
+ * The controller of Lax Aura Component
+ * @namespace LaxHelper
+ */
+(
+  {
   /**
-   * Initialization function called every time lax component instantiated
+   * Initialization function called every time Lax Aura Component instantiated
+   * @memberof LaxHelper#
    * @param component {Object} - the lax component object
    */
   init: function init(component) {
-    /**
-     * @namespace
-     * @property {Lax} lax
-     */
     const contextComponent = component.get('v.context');
     const laxProps = {
       _component: {
@@ -58,8 +60,10 @@
   },
 
   /**
-   * The function creates the lax object and save it on the handler.
-   * It calls every time the lax instantiated, that is why the object is saved on helper.
+   * The function creates the Lax object and save it on the helper.
+   * Helpers of Aura components are static, it allows to share prototype
+   * Lax object on a helper instance.
+   * @memberOf LaxHelper#
    * @returns {Lax}
    */
   getLax: function getLax() {
@@ -71,8 +75,9 @@
   },
 
   /**
-   * Create the lax object to create initial prototype.
-   * The function calls ones and when the first lax component in the app.
+   * Creates a prototype Lax object.
+   * The function calls when the first Lax component in the app instantiates.
+   * @memberOf LaxHelper#
    * @returns {Lax}
    */
   createLax: function createLax() {
@@ -200,16 +205,18 @@
      * The container of the actual context promise.
      * It helps to call chain function (<code>then</code>, <code>catch</code>)
      * in the Aura context. The client can avoid of <code>$A.getCallback</code> calls.
-     * @typedef {Object} LaxPromise
+     * @class LaxPromise
      */
-    const laxPromise = {
+    const laxPromise =
+    /**
+     * @lends LaxPromise#
+     */
+    {
       /**
        * Attaches callbacks for the resolution and/or rejection of the Promise.
-       * @method
-       * @name LaxPromise#then
        * @param onSuccess {Function|undefined} The callback to execute when the Promise is resolved.
        * @param onError {Function=} The callback to execute when the Promise is rejected.
-       * @returns {LaxPromise} A Promise for the completion of which ever callback is executed.
+       * @returns {LaxPromise} A {@link LaxPromise} for the completion of which ever callback is executed.
        */
       then: function (onSuccess, onError) {
         // TODO: check: is for valid functions?
@@ -224,10 +231,16 @@
 
       /**
        * Attaches a callback for only the rejection of the Promise.
-       * @method
-       * @name LaxPromise#catch
        * @param onError {Function} The callback to execute when the Promise is rejected.
-       * @returns {LaxPromise} A Promise for the completion of the callback.
+       * @returns {LaxPromise} A {@link LaxPromise} for the completion of the callback.
+       * @example
+       * component.lax.enqueue('c.save', { record: record })
+       *  .then(id => {
+       *    component.set('v.record.id', id);
+       *  })
+       *  .catch(errors => {
+       *    console.error(errors);
+       *  });
        */
       catch: function (onError) {
         let promise;
@@ -248,17 +261,26 @@
         return util.createAuraContextPromise(promise);
       },
 
+      /**
+       * The method returns a {@link LaxPromise}.
+       * When the Promise is settled, whether fulfilled or rejected, the specified callback function is executed.
+       * This provides a way for code that must be executed once the Promise has been dealt with to be run
+       * whether the promise was fulfilled successfully or rejected.
+       *
+       * This lets you avoid duplicating code in both the promise's then() and catch() handlers.
+       * @param callback {Function} The function to run whe the Promise is settled
+       * @returns {LaxPromise}
+       */
       finally: function (callback) {
         const promise = this._contextPromise.finally(callback);
         return util.createAuraContextPromise(promise);
       },
 
       /**
-       *
-       * @method
-       * @name LaxPromise#error
-       * @param onError {Function}
-       * @returns {LaxPromise}
+       * Attaches a callback for only the rejection of the Promise
+       * and for only actions that returns "ERROR" state
+       * @param onError {Function} The callback to execute when the Promise is rejected.
+       * @returns {LaxPromise} A {@link LaxPromise} for the completion of the callback.
        */
       error: function (onError) {
         const fn = util.assignCatchFilters([errors.ApexActionError], onError, this);
@@ -266,11 +288,10 @@
       },
 
       /**
-       *
-       * @method
-       * @name LaxPromise#incomplete
-       * @param onIncomplete {Function}
-       * @returns {LaxPromise}
+       * Attaches a callback for only the rejection of the Promise
+       * and for only actions that returns "INCOMPLETE" state
+       * @param onIncomplete {Function} The callback to execute when the Promise is rejected.
+       * @returns {LaxPromise} A {@link LaxPromise} for the completion of the callback.
        */
       incomplete: function (onIncomplete) {
         const fn = util.assignCatchFilters([errors.IncompleteActionError], onIncomplete, this);
@@ -310,15 +331,18 @@
      * The container of the actual Lightning Data Service (LDS). It delegates
      * actions to LDS and provide and API to chain them. Actions callback functions don't
      * require <code>$A.getCallback()</code> wrapper.
-     * @typedef {Object} LaxDataService
+     * @class LaxDataService
      */
-    const laxDataService = {
+    const laxDataService =
+    /**
+     * @lends LaxDataService#
+     */
+    {
 
       /**
        * The function to save the record that loaded to LDS edit <code>EDIT</code> mode.
        * It used to create a record and save it or to save the changes to an existing one.
        * @see https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/data_service_save_record.htm
-       * @name LaxDataService#saveRecord
        * @returns {LaxPromise}
        */
       saveRecord: function () {
@@ -334,21 +358,11 @@
        * The function to load a record template to the LDS <code>targetRecord</code> attribute.
        * It doesn't return a result to callback function.
        * It simply prepares an empty record and assigns it to the <code>targetRecord</code> attribute.
-       * @param
-       * @name LaxDataService#getNewRecord
-       * @returns {LaxPromise}
-       */
-
-      /**
-       * The function to load a record template to the LDS <code>targetRecord</code> attribute.
-       * It doesn't return a result to callback function.
-       * It simply prepares an empty record and assigns it to the <code>targetRecord</code> attribute.
        * @param sobjectType {String=} the object API name for the new record.
        * @param recordTypeId {String=} the 18 character ID of the record type for the new record.
        * If not specified, the default record type for the object is used, as defined in the user’s profile.
        * @param skipCache {Boolean=} whether to load the record template from the server instead of the
        * client-side Lightning Data Service cache. Defaults to false.
-       * @name LaxDataService#getNewRecord
        * @returns {LaxPromise}
        */
       getNewRecord: function (sobjectType, recordTypeId, skipCache) {
@@ -366,7 +380,6 @@
 
       /**
        * The function to delete a record using LDS.
-       * @name LaxDataService#deleteRecord
        * @returns {LaxPromise}
        */
       deleteRecord: function () {
@@ -383,14 +396,16 @@
      * The object based on builder pattern to call Aura action.
      * It is instantiated to be used by {@link Lax} as a prototype of actual actions.
      * This type of action does not use Promise approach and subsequently can be called as storable.
-     * @typedef {Object} LaxActionBuilder
+     * @class LaxActionBuilder
      */
-    const laxActionBuilder = {
+    const laxActionBuilder =
+    /**
+     * @lends LaxActionBuilder#
+     */
+    {
 
       /**
        * Assign the success callback on Aura action
-       * @method
-       * @name LaxActionBuilder#setThen
        * @param callback {Function}
        * @returns {LaxActionBuilder}
        */
@@ -401,8 +416,6 @@
 
       /**
        * Assigns the failure callback on Aura action. This function called when the error occurs.
-       * @method
-       * @name LaxActionBuilder#setCatch
        * @param callback {Function}
        * @returns {LaxActionBuilder}
        */
@@ -413,8 +426,6 @@
 
       /**
        * Sets parameters for the action.
-       * @method
-       * @name LaxActionBuilder#setParams
        * @param params {Object}
        * @returns {LaxActionBuilder}
        */
@@ -425,8 +436,6 @@
 
       /**
        * Marks the action as a {@link https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/controllers_server_storable_actions.htm|Storable}
-       * @method
-       * @name LaxActionBuilder#setStorable
        * @returns {LaxActionBuilder}
        */
       setStorable: function setStorable() {
@@ -436,8 +445,6 @@
 
       /**
        * Marks the action as a {@link https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/controllers_server_background_actions.htm|Background}
-       * @method
-       * @name LaxActionBuilder#setBackground
        * @returns {LaxActionBuilder}
        */
       setBackground: function setBackground() {
@@ -448,8 +455,7 @@
       /**
        * Enqueues the action. The function do not return the object itself and should be
        * called at the end of the builder chain.
-       * @method
-       * @name LaxActionBuilder#enqueue
+       * @returns {void}
        */
       enqueue: function enqueue() {
         this._action.setCallback(this._component, actionRouter(this._resolveCallback, this._rejectCallback));
@@ -460,14 +466,16 @@
 
     /**
      * The object based on builder pattern to fire Lightning Application or Component events.
-     * @typedef {Object} LaxEventBuilder
+     * @class LaxEventBuilder
      */
-    const laxEventBuilder = {
-
+    const laxEventBuilder =
+      /**
+       * @lends LaxEventBuilder#
+       */
+      {
       /**
        * Sets data for the event attributes. A parameter’s name must match the name attribute
        * of one of the event’s <code>aura:attribute</code> tags.
-       * @name LaxEventBuilder#setParams
        * @param params {Object} the data of event attributes
        * @returns {LaxEventBuilder}
        */
@@ -478,7 +486,7 @@
 
       /**
        * Fires the event.
-       * @name LaxEventBuilder#fire
+       * @returns {void}
        */
       fire: function fire() {
         this._event.fire();
@@ -487,27 +495,44 @@
     };
 
     /**
+     * The object with list of Aura Server-Side action options
+     * @typedef {Object} ActionOptions
+     * @property storable {Boolean} Marks action as a <a href="https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/controllers_server_storable_actions.htm">Storable</a>
+     * @property background {Boolean} Marks action as a <a href="https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/controllers_server_background_actions.htm">Background</a>
+     * @property abortable {Boolean} Marks action as a <a href="https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/controllers_server_abortable_actions.htm">Abortable</a>
+     */
+
+    /**
+     * The object that contains a properties for Aura Server-Side Action
+     * @typedef {Object} ActionProperties
+     * @property name {String} The name of the action. It must be the same as Apex @AuraEnabled method
+     * @property params {Object} The object with parameters values for the action. It is based on Apex @AuraEnabled method
+     * @property options {Object} The object with list of options that can be applied to the action
+     */
+
+    /**
      * The action main object of the component that is used as a shared prototype across all lax components
      * created in the application. See <code>init</code> function of the laxHelper.js where the lax assigned as prototype.
-     * @typedef {Object} Lax
+     * @class Lax
      */
-    const lax = {
-
+    const lax =
       /**
-       * The object with list of Aura action options
-       * @typedef {{storable: Boolean=, background: Boolean=, abortable: Boolean=}} ActionOptions
+       * @lends Lax#
        */
-
+      {
       /**
        * Enqueues the action by the name and with passed in params and options.
        * The function returns Promise, subsequently client can chain the actions
        * by assigning <code>then</code> callbacks or handle the error by <code>catch</code> callback.
-       * @method
-       * @name Lax#enqueue
        * @param actionName {String} the name of the action (Apex controller method name)
-       * @param params {Object=} the object that contains parameters for the action
-       * @param options {ActionOptions=} the object with list of options for the action
+       * @param params [Object] the object that contains parameters for the action
+       * @param options [ActionOptions] the object with list of options for the action
        * @returns {LaxPromise}
+       * @example
+       * component.lax.enqueue('c.getContact', { id: recordId }, { background: true })
+       *   .then(contact => {
+       *     component.set('v.record', contact);
+       *   });
        */
       enqueue: function enqueue(actionName, params, options) {
         const self = this;
@@ -534,10 +559,21 @@
        * Enqueues the list of actions parallel.
        * The function return {@link Promise} that subsequently can be used to chain callback.
        * The success callback assigned on the {@link Promise} called after all actions ready and an error have not thrown.
-       * @method
-       * @name Lax#enqueueAll
-       * @param actions {{name: String, params: Object=, options: ActionOptions=}[]}
+       * @param actions {ActionProperties[]}
        * @returns {LaxPromise}
+       * @example
+       * component.lax.enqueueAll([
+       *   // { name : '...', params: {...}, options: {...} }
+       *   { name: 'c.getContacts' },
+       *   { name: 'c.getAccounts' },
+       *   { name: 'c.getOpportunities' }
+       * ])
+       * .then(results => {
+       *   // results: [ [contacts], [accounts], [opportunities] ]
+       *   const contacts = results[0];
+       *   const accounts = results[1];
+       *   const opportunities = results[2];
+       * });
        */
       enqueueAll: function enqueueAll(actions) {
         const self = this;
@@ -550,10 +586,20 @@
 
       /**
        * Creates the action linked to {@link LaxActionBuilder} by the provided name.
-       * @method
-       * @name Lax#action
        * @param actionName {String} the name of the action (Apex controller method)
        * @returns {LaxActionBuilder}
+       * @example
+       * component.lax
+       *  .action('c.getContact')
+       *  .setStorable()
+       *  .setParams({ id: recordId })
+       *  .setThen(contact => {
+       *    component.set('v.record', contact)
+       *  })
+       *  .setCatch(error => {
+       *    console.error(error);
+       *  })
+       *  .enqueue();
        */
       action: function action(actionName) {
         const c = this._component;
@@ -577,8 +623,6 @@
       /**
        * Creates an object with {LaxEventBuilder} prototype with the context
        * event by provided name. The function apply Application and Component event name.
-       * @method
-       * @name Lax#event
        * @param eventName {String} the name of the event
        * @returns {LaxEventBuilder}
        */
@@ -596,8 +640,6 @@
 
       /**
        * Creates a container of actual Lightning Data Service object.
-       * @method
-       * @name Lax#lds
        * @param id {String} the aura:id of the <code>force:record</code> (Lightning Data Service) tag
        * @returns {LaxDataService}
        */
@@ -619,8 +661,6 @@
        * Create a component from a type and a set of attributes.
        * It accepts the name of a type of component, a map of attributes,
        * and returns {LaxPromise} to assign a callback function to notify caller.
-       * @method
-       * @name Lax#createComponent
        * @param {String} type The type of component to create, e.g. "ui:button".
        * @param {Object} attributes A map of attributes to send to the component. These take the same form as on the markup,
        * including events <code>{"press":component.getReference("c.handlePress")}</code>, and id <code>{"aura:id":"myComponentId"}</code>.
@@ -643,8 +683,6 @@
        * Create an array of components from a list of types and attributes.
        * It accepts a list of component names and attribute maps, and returns
        * {LaxPromise} to assign a callback function to notify caller.
-       * @method
-       * @name Lax#createComponents
        * @param {Array} components The list of components to create, e.g. <code>["ui:button",{"press":component.getReference("c.handlePress")}]</code>
        * @example
        * lax.createComponents([

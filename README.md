@@ -1,4 +1,4 @@
-![Logo](https://github.com/ruslan-kurchenko/sfdc-lax/blob/master/assets/logo/logo-1280-676.png)
+![Logo](https://github.com/ruslan-kurchenko/sfdc-lax/blob/master/assets/logo/logo-1280-676.png?raw=true)
 
 Lax is a Lightning Component to write a clear asynchronous JavaScript code. It helps you to remove the boilerplate code in Lightning Components. Lax combines capabilities to efficiently call Apex with powerful exception handling and list of utility techniques, giving you an ability to write asynchronous code in a modern approach.
 
@@ -19,7 +19,7 @@ Click on the button below to deploy the component to the org
 
 [![Deploy to Salesforce](https://raw.githubusercontent.com/afawcett/githubsfdeploy/master/src/main/webapp/resources/img/deploy.png)](https://githubsfdeploy.herokuapp.com/app/githubdeploy/ruslan-kurchenko/sfdc-lax)
 
-## Example
+## Usage
 
 Define `lax` component in a custom component markup:
 ```html
@@ -50,7 +50,7 @@ Enqueue an action in component's [aura:valueInit](https://developer.salesforce.c
 - `lax` is ready to use in consumer's component [aura:valueInit](https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/ref_aura_valueInit.htm) event handler
 - Every consumer component has its own `lax` object. Every `lax` object [inherits](https://github.com/ruslan-kurchenko/sfdc-lax/blob/master/src/aura/lax/laxHelper.js#L47) methods from [grand parent](https://github.com/ruslan-kurchenko/sfdc-lax/blob/master/src/aura/lax/laxHelper.js#L233)
 
-## API Reference
+## Examples
 
 Actions can be enqueued by passing the relevant parameters and options.
 
