@@ -26,8 +26,7 @@
  * The controller of Lax Aura Component
  * @namespace LaxController
  */
-"use strict";
-// eslint-disable-next-line no-unused-expressions
+// eslint-disable-next-line no-unused-expressions,strict
 ({
   /**
    * Initialization function called every time Lax Aura Component instantiated
