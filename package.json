@@ -24,6 +24,7 @@
   },
   "homepage": "https://github.com/ruslan-kurchenko/sfdc-lax#readme",
   "devDependencies": {
+    "@salesforce/eslint-plugin-aura": "^1.0.0",
     "docdash": "^0.4.0",
     "eslint": "^4.8.0",
     "eslint-config-airbnb-base": "^12.0.2",

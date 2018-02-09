@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>LaxPromise - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Lax.html">Lax</a><ul class='methods'><li data-type='method'><a href="Lax.html#action">action</a></li><li data-type='method'><a href="Lax.html#createComponent">createComponent</a></li><li data-type='method'><a href="Lax.html#createComponents">createComponents</a></li><li data-type='method'><a href="Lax.html#enqueue">enqueue</a></li><li data-type='method'><a href="Lax.html#enqueueAll">enqueueAll</a></li><li data-type='method'><a href="Lax.html#event">event</a></li><li data-type='method'><a href="Lax.html#lds">lds</a></li></ul></li><li><a href="LaxActionBuilder.html">LaxActionBuilder</a><ul class='methods'><li data-type='method'><a href="LaxActionBuilder.html#enqueue">enqueue</a></li><li data-type='method'><a href="LaxActionBuilder.html#setBackground">setBackground</a></li><li data-type='method'><a href="LaxActionBuilder.html#setCatch">setCatch</a></li><li data-type='method'><a href="LaxActionBuilder.html#setParams">setParams</a></li><li data-type='method'><a href="LaxActionBuilder.html#setStorable">setStorable</a></li><li data-type='method'><a href="LaxActionBuilder.html#setThen">setThen</a></li></ul></li><li><a href="LaxDataService.html">LaxDataService</a><ul class='methods'><li data-type='method'><a href="LaxDataService.html#deleteRecord">deleteRecord</a></li><li data-type='method'><a href="LaxDataService.html#getNewRecord">getNewRecord</a></li><li data-type='method'><a href="LaxDataService.html#saveRecord">saveRecord</a></li></ul></li><li><a href="LaxEventBuilder.html">LaxEventBuilder</a><ul class='methods'><li data-type='method'><a href="LaxEventBuilder.html#fire">fire</a></li><li data-type='method'><a href="LaxEventBuilder.html#setParams">setParams</a></li></ul></li><li><a href="LaxPromise.html">LaxPromise</a><ul class='methods'><li data-type='method'><a href="LaxPromise.html#catch">catch</a></li><li data-type='method'><a href="LaxPromise.html#error">error</a></li><li data-type='method'><a href="LaxPromise.html#finally">finally</a></li><li data-type='method'><a href="LaxPromise.html#incomplete">incomplete</a></li><li data-type='method'><a href="LaxPromise.html#then">then</a></li></ul></li></ul><h3>Namespaces</h3><ul><li><a href="LaxController.html">LaxController</a><ul class='methods'><li data-type='method'><a href="LaxController.html#onInit">onInit</a></li></ul></li><li><a href="LaxHelper.html">LaxHelper</a><ul class='methods'><li data-type='method'><a href="LaxHelper.html#createLax">createLax</a></li><li data-type='method'><a href="LaxHelper.html#getLax">getLax</a></li><li data-type='method'><a href="LaxHelper.html#init">init</a></li></ul></li></ul><h3><a href="global.html">Global</a></h3>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">LaxPromise</h1>
+    
+
+    
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>
+        LaxPromise
+        </h2>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+
+    
+
+    <h4 class="name" id="LaxPromise"><span class="type-signature"></span>new LaxPromise<span class="signature">()</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="laxHelper.js.html">laxHelper.js</a>, <a href="laxHelper.js.html#line204">line 204</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    The container of the actual context promise.
+It helps to call chain function (<code>then</code>, <code>catch</code>)
+in the Aura context. The client can avoid of <code>$A.getCallback</code> calls.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    </div>
+
+    
+
+    
+
+    
+
+     
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    <h4 class="name" id="catch"><span class="type-signature"></span>catch<span class="signature">(onError)</span><span class="type-signature"> &rarr; {<a href="LaxPromise.html">LaxPromise</a>}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="laxHelper.js.html">laxHelper.js</a>, <a href="laxHelper.js.html#line245">line 245</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    Attaches a callback for only the rejection of the Promise.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>component.lax.enqueue('c.save', { record: record })
+ .then(id => {
+   component.set('v.record.id', id);
+ })
+ .catch(errors => {
+   console.error(errors);
+ });</code></pre>
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>onError</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The callback to execute when the Promise is rejected.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    A <a href="LaxPromise.html">LaxPromise</a> for the completion of the callback.
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="LaxPromise.html">LaxPromise</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="error"><span class="type-signature"></span>error<span class="signature">(onError)</span><span class="type-signature"> &rarr; {<a href="LaxPromise.html">LaxPromise</a>}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="laxHelper.js.html">laxHelper.js</a>, <a href="laxHelper.js.html#line285">line 285</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    Attaches a callback for only the rejection of the Promise
+and for only actions that returns "ERROR" state
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>onError</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The callback to execute when the Promise is rejected.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    A <a href="LaxPromise.html">LaxPromise</a> for the completion of the callback.
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="LaxPromise.html">LaxPromise</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="finally"><span class="type-signature"></span>finally<span class="signature">(callback)</span><span class="type-signature"> &rarr; {<a href="LaxPromise.html">LaxPromise</a>}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="laxHelper.js.html">laxHelper.js</a>, <a href="laxHelper.js.html#line274">line 274</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    The method returns a <a href="LaxPromise.html">LaxPromise</a>.
+When the Promise is settled, whether fulfilled or rejected, the specified callback function is executed.
+This provides a way for code that must be executed once the Promise has been dealt with to be run
+whether the promise was fulfilled successfully or rejected.
+
+This lets you avoid duplicating code in both the promise's then() and catch() handlers.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>callback</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The function to run whe the Promise is settled</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="LaxPromise.html">LaxPromise</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="incomplete"><span class="type-signature"></span>incomplete<span class="signature">(onIncomplete)</span><span class="type-signature"> &rarr; {<a href="LaxPromise.html">LaxPromise</a>}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="laxHelper.js.html">laxHelper.js</a>, <a href="laxHelper.js.html#line296">line 296</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    Attaches a callback for only the rejection of the Promise
+and for only actions that returns "INCOMPLETE" state
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>onIncomplete</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The callback to execute when the Promise is rejected.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    A <a href="LaxPromise.html">LaxPromise</a> for the completion of the callback.
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="LaxPromise.html">LaxPromise</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="then"><span class="type-signature"></span>then<span class="signature">(onSuccess, onError<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {<a href="LaxPromise.html">LaxPromise</a>}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="laxHelper.js.html">laxHelper.js</a>, <a href="laxHelper.js.html#line221">line 221</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    Attaches callbacks for the resolution and/or rejection of the Promise.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>onSuccess</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+|
+
+<span class="param-type">undefined</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">The callback to execute when the Promise is resolved.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>onError</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">The callback to execute when the Promise is rejected.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    A <a href="LaxPromise.html">LaxPromise</a> for the completion of which ever callback is executed.
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="LaxPromise.html">LaxPromise</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Feb 01 2018 17:58:39 GMT+0200 (EET) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

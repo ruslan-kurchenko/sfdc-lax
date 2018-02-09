@@ -26,6 +26,8 @@
  * The controller of Lax Aura Component
  * @namespace LaxController
  */
+"use strict";
+// eslint-disable-next-line no-unused-expressions
 ({
   /**
    * Initialization function called every time Lax Aura Component instantiated
@@ -34,5 +36,5 @@
    */
   onInit: function onInit(component, event, helper) {
     helper.init(component, event);
-  },
+  }
 });

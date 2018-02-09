@@ -26,6 +26,9 @@
  * The controller of Lax Aura Component
  * @namespace LaxHelper
  */
+
+"use strict";
+// eslint-disable-next-line no-unused-expressions
 (
   {
   /**
@@ -33,120 +36,122 @@
    * @memberof LaxHelper#
    * @param component {Object} - the lax component object
    */
-  init: function init(component) {
-    const contextComponent = component.get('v.context');
-    const laxProps = {
-      _component: {
+    init: function init(component) {
+      var contextComponent = component.get('v.context');
+      var laxProps = {
+        _component: {
+          writable: false,
+          configurable: false,
+          enumerable: false,
+          value: contextComponent
+        }
+      };
+
+      // Create an object that is inherit all the functionality from
+      // the Lax object due to prototype inheritance
+      var lax = Object.create(this.getLax(), laxProps);
+
+      // Create Lax property on the context component object that is refer on
+      // newly created Lax object
+      var componentProps = {
         writable: false,
         configurable: false,
         enumerable: false,
-        value: contextComponent,
-      },
-    };
+        value: lax
+      };
+      Object.defineProperty(contextComponent, 'lax', componentProps);
+    },
 
-    // Create an object that is inherit all the functionality from
-    // the Lax object due to prototype inheritance
-    const lax = Object.create(this.getLax(), laxProps);
-
-    // Create Lax property on the context component object that is refer on
-    // newly created Lax object
-    const componentProps = {
-      writable: false,
-      configurable: false,
-      enumerable: false,
-      value: lax,
-    };
-    Object.defineProperty(contextComponent, 'lax', componentProps);
-  },
-
-  /**
+    /**
    * The function creates the Lax object and save it on the helper.
    * Helpers of Aura components are static, it allows to share prototype
    * Lax object on a helper instance.
    * @memberOf LaxHelper#
    * @returns {Lax}
    */
-  getLax: function getLax() {
-    if (!this._lax) {
-      this._lax = this.createLax();
-    }
+    getLax: function getLax() {
+      if (!this._lax) {
+        this._lax = this.createLax();
+      }
 
-    return this._lax;
-  },
+      return this._lax;
+    },
 
-  /**
+    /**
    * Creates a prototype Lax object.
    * The function calls when the first Lax component in the app instantiates.
    * @memberOf LaxHelper#
    * @returns {Lax}
    */
-  createLax: function createLax() {
-    const helper = this;
+    createLax: function createLax() {
+      var helper = this;
 
-    const errors = helper.defineErrors();
+      var errors = helper.defineErrors();
 
-    /**
+      /**
      * Creates a unified function to be assign as a callback on the aura action.
      * @param resolve {Function} the function called if the action is success
      * @param reject {Function} the function called if the action is failed
      * @returns {Function}
      */
-    function actionRouter(resolve, reject, finallyCallback) {
-      return function (response) {
-        const state = response.getState();
+      function actionRouter(resolve, reject, finallyCallback) {
+        return function (response) {
+          var state = response.getState();
 
-        if (state === 'SUCCESS') {
-          resolve(response.getReturnValue());
-        } else {
-          let message = 'Unknown error';
+          if (state === 'SUCCESS') {
+            resolve(response.getReturnValue());
+          } else {
+            var message = 'Unknown error';
 
-          const responseErrors = response.getError();
-          if (responseErrors && Array.isArray(responseErrors) && responseErrors.length > 0) {
-            message = responseErrors[0].message;
+            var responseErrors = response.getError();
+            if (responseErrors && Array.isArray(responseErrors) && responseErrors.length > 0) {
+              message = responseErrors[0].message;
+            }
+
+            var errorConstructor = state === 'INCOMPLETE' ? errors.IncompleteActionError : errors.ApexActionError;
+            reject(new errorConstructor(message, responseErrors, response));
           }
 
-          const errorConstructor = state === 'INCOMPLETE' ? errors.IncompleteActionError : errors.ApexActionError;
-          reject(new errorConstructor(message, responseErrors, response));
-        }
+          if (finallyCallback) {
+            finallyCallback();
+          }
+        };
+      }
 
-        if (finallyCallback) finallyCallback();
-      };
-    }
-
-    /**
+      /**
      * Creates a unified function to be assign as a callback on the component creation action.
      * @param resolve {Function} the function called if the component creation successfully
      * @param reject {Function} the function called if the component failed to create
      * @returns {Function}
      */
-    function createComponentActionRouter(resolve, reject) {
-      return function (component, status, message) {
-        const result = { status: status };
-        const isMultiple = $A.util.isArray(message);
-        if (isMultiple) {
-          result.components = component;
-          result.statusMessages = message;
-        } else {
-          result.component = component;
-          result.message = message;
-        }
-
-        if (status === 'SUCCESS') {
-          resolve(component);
-        } else {
-          const errorConstructor = status === 'INCOMPLETE' ? errors.IncompleteActionError : errors.CreateComponentError;
-
+      function createComponentActionRouter(resolve, reject) {
+        return function (component, status, message) {
+          var result = { status: status };
+          var isMultiple = $A.util.isArray(message);
           if (isMultiple) {
-            let msg = 'An error occurred while a component creation process.';
-            reject(new errorConstructor(msg, result.statusMessages, result));
+            result.components = component;
+            result.statusMessages = message;
           } else {
-            reject(new errorConstructor(message, null, result));
+            result.component = component;
+            result.message = message;
           }
-        }
-      }
-    }
 
-    const util = {
+          if (status === 'SUCCESS') {
+            resolve(component);
+          } else {
+            var errorConstructor = status === 'INCOMPLETE' ? errors.IncompleteActionError : errors.CreateComponentError;
+
+            if (isMultiple) {
+              var msg = 'An error occurred while a component creation process.';
+              reject(new errorConstructor(msg, result.statusMessages, result));
+            } else {
+              reject(new errorConstructor(message, null, result));
+            }
+          }
+        };
+      }
+
+      var util = {
       /**
        * Create an object and bind it with passed in Promise prototype.
        * It has own chaining functions (<code>then</code>, <code>catch</code>),
@@ -155,61 +160,61 @@
        * @param promise {Promise}
        * @returns {LaxPromise}
        */
-      createAuraContextPromise: function (promise) {
-        const lp = Object.create(promise);
-        Object.defineProperty(lp, '_contextPromise', {
-          writable: false,
-          configurable: false,
-          enumerable: true,
-          value: promise,
-        });
+        createAuraContextPromise: function (promise) {
+          var lp = Object.create(promise);
+          Object.defineProperty(lp, '_contextPromise', {
+            writable: false,
+            configurable: false,
+            enumerable: true,
+            value: promise
+          });
+          // eslint-disable-next-line no-use-before-define
+          return Object.assign(lp, laxPromise);
+        },
 
-        return Object.assign(lp, laxPromise);
-      },
+        assignCatchFilters: function (handleErrors, callback, promise) {
+          return function routeError(error) {
+            for (var i = 0; i < handleErrors.length; i = i + 1) {
+              var errorType = handleErrors[i];
+              if (errorType === Error ||
+              (errorType !== null && errorType.prototype instanceof Error)) {
 
-      assignCatchFilters: function (handleErrors, callback, promise) {
-        return function routeError(error) {
-          for (let i = 0; i < handleErrors.length; i++) {
-            const errorType = handleErrors[i];
-            if (errorType === Error ||
-              (errorType != null && errorType.prototype instanceof Error)) {
-
-              if (error instanceof errorType || error.name === errorType.name) {
-                return util.tryCatch(callback).call(promise, error);
+                if (error instanceof errorType || error.name === errorType.name) {
+                  return util.tryCatch(callback).call(promise, error);
+                }
               }
             }
-          }
 
-          return Promise.reject(error);
-        };
-      },
+            return Promise.reject(error);
+          };
+        },
 
-      tryCatch: function (callback) {
-        return function tryCallback() {
-          try {
-            return callback.apply(this, arguments);
-          } catch (e) {
-            return Promise.reject(e);
-          }
-        };
-      },
+        tryCatch: function (callback) {
+          return function tryCallback() {
+            try {
+              return callback.apply(this, arguments);
+            } catch (e) {
+              return Promise.reject(e);
+            }
+          };
+        },
 
-      registerError: function (error) {
-        errors[error.name] = error;
-      },
+        registerError: function (error) {
+          errors[error.name] = error;
+        },
 
-      isApplicationEvent: function (eventName) {
-        return eventName.indexOf('e.') === 0 && eventName.indexOf(':') > 0
-      }
-    };
+        isApplicationEvent: function (eventName) {
+          return eventName.indexOf('e.') === 0 && eventName.indexOf(':') > 0;
+        }
+      };
 
-    /**
+      /**
      * The container of the actual context promise.
      * It helps to call chain function (<code>then</code>, <code>catch</code>)
      * in the Aura context. The client can avoid of <code>$A.getCallback</code> calls.
      * @class LaxPromise
      */
-    const laxPromise =
+      var laxPromise =
     /**
      * @lends LaxPromise#
      */
@@ -221,9 +226,7 @@
        * @returns {LaxPromise} A {@link LaxPromise} for the completion of which ever callback is executed.
        */
       then: function (onSuccess, onError) {
-        // TODO: check: is for valid functions?
-
-        const promise = this._contextPromise.then(
+        var promise = this._contextPromise.then(
           (onSuccess ?  $A.getCallback(onSuccess) : undefined),
           (onError ?  $A.getCallback(onError) : undefined)
         );
@@ -245,16 +248,16 @@
        *  });
        */
       catch: function (onError) {
-        let promise;
-        const len = arguments.length;
+        var promise;
+        var len = arguments.length;
         if (len > 1) {
-          const errorTypes = new Array(len - 1);
-          for (let i = 0; i < len - 1; i++) {
+          var errorTypes = new Array(len - 1);
+          for (var i = 0; i < len - 1; i = i + 1) {
             errorTypes[i] = arguments[i];
           }
-          onError = arguments[len - 1];
+          var onErrorCallback = arguments[len - 1];
 
-          const filteredOnReject = util.assignCatchFilters(errorTypes, onError, this);
+          var filteredOnReject = util.assignCatchFilters(errorTypes, onErrorCallback, this);
           promise = this.then(undefined, filteredOnReject);
         } else {
           promise = this.then(undefined, onError);
@@ -274,7 +277,7 @@
        * @returns {LaxPromise}
        */
       finally: function (callback) {
-        const promise = this._contextPromise.finally(callback);
+        var promise = this._contextPromise.finally(callback);
         return util.createAuraContextPromise(promise);
       },
 
@@ -285,7 +288,7 @@
        * @returns {LaxPromise} A {@link LaxPromise} for the completion of the callback.
        */
       error: function (onError) {
-        const fn = util.assignCatchFilters([errors.ApexActionError, errors.CreateComponentError], onError, this);
+        var fn = util.assignCatchFilters([errors.ApexActionError, errors.CreateComponentError], onError, this);
         return this.then(undefined, fn);
       },
 
@@ -296,46 +299,47 @@
        * @returns {LaxPromise} A {@link LaxPromise} for the completion of the callback.
        */
       incomplete: function (onIncomplete) {
-        const fn = util.assignCatchFilters([errors.IncompleteActionError], onIncomplete, this);
+        var fn = util.assignCatchFilters([errors.IncompleteActionError], onIncomplete, this);
         return this.then(undefined, fn);
-      },
+      }
     };
 
-    /**
+      /**
      * Creates a unified function to assign it as a callback on the LDS action.
      * The returned function is a router for the result of the action.
      * @param resolve {Function} the function called if the action is success
      * @param reject {Function} the function called if the action is failed
      * @returns {Function}
      */
-    function ldsActionRouter(resolve, reject) {
-      return function(result) {
-        if (result.state === 'SUCCESS' || result.state === 'DRAFT') {
-          resolve(result);
-        } else if (result.state === 'ERROR') {
-          let message = 'Unknown error';
+      function ldsActionRouter(resolve, reject) {
+        return function(result) {
+          var message;
+          if (result.state === 'SUCCESS' || result.state === 'DRAFT') {
+            resolve(result);
+          } else if (result.state === 'ERROR') {
+            message = 'Unknown error';
 
-          if (result.error && Array.isArray(result.error) && result.error.length > 0) {
-            message = result.error[0].message;
+            if (result.error && Array.isArray(result.error) && result.error.length > 0) {
+              message = result.error[0].message;
+            }
+
+            reject(new errors.LdsActionError(message, result.error, result));
+          } else if (result.state === 'INCOMPLETE') {
+            message = 'You are currently offline.';
+            reject(new errors.IncompleteActionError(message, result.error, result));
+          } else {
+            reject(new Error('Unknown action state'));
           }
-
-          reject(new errors.LdsActionError(message, result.error, result));
-        } else if (result.state === 'INCOMPLETE') {
-          const message = 'You are currently offline.';
-          reject(new errors.IncompleteActionError(message, result.error, result));
-        } else {
-          reject(new Error('Unknown action state'));
-        }
+        };
       }
-    }
 
-    /**
+      /**
      * The container of the actual Lightning Data Service (LDS). It delegates
      * actions to LDS and provide and API to chain them. Actions callback functions don't
      * require <code>$A.getCallback()</code> wrapper.
      * @class LaxDataService
      */
-    const laxDataService =
+      var laxDataService =
     /**
      * @lends LaxDataService#
      */
@@ -348,8 +352,8 @@
        * @returns {LaxPromise}
        */
       saveRecord: function () {
-        const self = this;
-        const promise = new Promise(function (resolve, reject) {
+        var self = this;
+        var promise = new Promise(function (resolve, reject) {
           self._service.saveRecord(ldsActionRouter(resolve, reject));
         });
 
@@ -368,8 +372,8 @@
        * @returns {LaxPromise}
        */
       getNewRecord: function (sobjectType, recordTypeId, skipCache) {
-        const self = this;
-        const promise = new Promise(function (resolve, reject) {
+        var self = this;
+        var promise = new Promise(function (resolve) {
           function getNewRecordCallback () {
             resolve();
           }
@@ -385,8 +389,8 @@
        * @returns {LaxPromise}
        */
       deleteRecord: function () {
-        const self = this;
-        const promise = new Promise(function (resolve, reject) {
+        var self = this;
+        var promise = new Promise(function (resolve, reject) {
           self._service.deleteRecord(ldsActionRouter(resolve, reject));
         });
 
@@ -394,13 +398,13 @@
       }
     };
 
-    /**
+      /**
      * The object based on builder pattern to call Aura action.
      * It is instantiated to be used by {@link Lax} as a prototype of actual actions.
      * This type of action does not use Promise approach and subsequently can be called as storable.
      * @class LaxActionBuilder
      */
-    const laxActionBuilder =
+      var laxActionBuilder =
     /**
      * @lends LaxActionBuilder#
      */
@@ -471,17 +475,18 @@
        * @returns {void}
        */
       enqueue: function enqueue() {
-        this._action.setCallback(this._component, actionRouter(this._resolveCallback, this._rejectCallback, this._finallyCallback));
+        this._action.setCallback(this._component,
+          actionRouter(this._resolveCallback, this._rejectCallback, this._finallyCallback));
         $A.enqueueAction(this._action);
-      },
+      }
 
     };
 
-    /**
+      /**
      * The object based on builder pattern to fire Lightning Application or Component events.
      * @class LaxEventBuilder
      */
-    const laxEventBuilder =
+      var laxEventBuilder =
       /**
        * @lends LaxEventBuilder#
        */
@@ -492,22 +497,22 @@
        * @param params {Object} the data of event attributes
        * @returns {LaxEventBuilder}
        */
-      setParams: function setParams(params) {
-        this._event.setParams(params);
-        return this;
-      },
+        setParams: function setParams(params) {
+          this._event.setParams(params);
+          return this;
+        },
 
-      /**
+        /**
        * Fires the event.
        * @returns {void}
        */
-      fire: function fire() {
-        this._event.fire();
-      }
+        fire: function fire() {
+          this._event.fire();
+        }
 
-    };
+      };
 
-    /**
+      /**
      * The object with list of Aura Server-Side action options
      * @typedef {Object} ActionOptions
      * @property storable {Boolean} Marks action as a <a href="https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/controllers_server_storable_actions.htm">Storable</a>
@@ -515,7 +520,7 @@
      * @property abortable {Boolean} Marks action as a <a href="https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/controllers_server_abortable_actions.htm">Abortable</a>
      */
 
-    /**
+      /**
      * The object that contains a properties for Aura Server-Side Action
      * @typedef {Object} ActionProperties
      * @property name {String} The name of the action. It must be the same as Apex @AuraEnabled method
@@ -523,12 +528,12 @@
      * @property options {Object} The object with list of options that can be applied to the action
      */
 
-    /**
+      /**
      * The action main object of the component that is used as a shared prototype across all lax components
      * created in the application. See <code>init</code> function of the laxHelper.js where the lax assigned as prototype.
      * @class Lax
      */
-    const lax =
+      var lax =
       /**
        * @lends Lax#
        */
@@ -547,28 +552,32 @@
        *     component.set('v.record', contact);
        *   });
        */
-      enqueue: function enqueue(actionName, params, options) {
-        const self = this;
-        const promise = new Promise(function (resolve, reject) {
-          const action = self._component.get(actionName);
+        enqueue: function enqueue(actionName, params, options) {
+          var self = this;
+          var promise = new Promise(function (resolve, reject) {
+            var action = self._component.get(actionName);
 
-          if (params) {
-            action.setParams(params);
-          }
+            if (params) {
+              action.setParams(params);
+            }
 
-          if (options) {
-            if (options.background) action.setBackground();
-            if (options.storable) action.setStorable();
-          }
+            if (options) {
+              if (options.background) {
+                action.setBackground();
+              }
+              if (options.storable) {
+                action.setStorable();
+              }
+            }
 
-          action.setCallback(self._component, actionRouter(resolve, reject));
-          $A.enqueueAction(action);
-        });
+            action.setCallback(self._component, actionRouter(resolve, reject));
+            $A.enqueueAction(action);
+          });
 
-        return util.createAuraContextPromise(promise);
-      },
+          return util.createAuraContextPromise(promise);
+        },
 
-      /**
+        /**
        * Enqueues the list of actions parallel.
        * The function return {@link Promise} that subsequently can be used to chain callback.
        * The success callback assigned on the {@link Promise} called after all actions ready and an error have not thrown.
@@ -583,21 +592,21 @@
        * ])
        * .then(results => {
        *   // results: [ [contacts], [accounts], [opportunities] ]
-       *   const contacts = results[0];
-       *   const accounts = results[1];
-       *   const opportunities = results[2];
+       *   var contacts = results[0];
+       *   var accounts = results[1];
+       *   var opportunities = results[2];
        * });
        */
-      enqueueAll: function enqueueAll(actions) {
-        const self = this;
-        const promises = actions.map(function (a) {
-          return self.enqueue.call(self, a.name, a.params, a.options);
-        });
+        enqueueAll: function enqueueAll(actions) {
+          var self = this;
+          var promises = actions.map(function (a) {
+            return self.enqueue.call(self, a.name, a.params, a.options);
+          });
 
-        return util.createAuraContextPromise(Promise.all(promises));
-      },
+          return util.createAuraContextPromise(Promise.all(promises));
+        },
 
-      /**
+        /**
        * Creates the action linked to {@link LaxActionBuilder} by the provided name.
        * @param actionName {String} the name of the action (Apex controller method)
        * @returns {LaxActionBuilder}
@@ -614,63 +623,63 @@
        *  })
        *  .enqueue();
        */
-      action: function action(actionName) {
-        const c = this._component;
-        const props = {
-          _component: {
-            writable: false,
-            configurable: false,
-            enumerable: false,
-            value: c,
-          },
-          _action: {
-            writable: false,
-            configurable: false,
-            enumerable: false,
-            value: c.get(actionName),
-          },
-        };
-        return Object.create(laxActionBuilder, props);
-      },
+        action: function action(actionName) {
+          var c = this._component;
+          var props = {
+            _component: {
+              writable: false,
+              configurable: false,
+              enumerable: false,
+              value: c
+            },
+            _action: {
+              writable: false,
+              configurable: false,
+              enumerable: false,
+              value: c.get(actionName)
+            }
+          };
+          return Object.create(laxActionBuilder, props);
+        },
 
-      /**
+        /**
        * Creates an object with {LaxEventBuilder} prototype with the context
        * event by provided name. The function apply Application and Component event name.
        * @param eventName {String} the name of the event
        * @returns {LaxEventBuilder}
        */
-      event: function event(eventName) {
-        const props = {
-          _event: {
-            writable: false,
-            configurable: false,
-            enumerable: false,
-            value: util.isApplicationEvent(eventName) ? $A.get(eventName) : this._component.getEvent(eventName)
-          }
-        };
-        return Object.create(laxEventBuilder, props);
-      },
+        event: function event(eventName) {
+          var props = {
+            _event: {
+              writable: false,
+              configurable: false,
+              enumerable: false,
+              value: util.isApplicationEvent(eventName) ? $A.get(eventName) : this._component.getEvent(eventName)
+            }
+          };
+          return Object.create(laxEventBuilder, props);
+        },
 
-      /**
+        /**
        * Creates a container of actual Lightning Data Service object.
        * @param id {String} the aura:id of the <code>force:record</code> (Lightning Data Service) tag
        * @returns {LaxDataService}
        */
-      lds: function lds(id) {
-        const service = this._component.find(id);
-        const serviceProp = {
+        lds: function lds(id) {
+          var service = this._component.find(id);
+          var serviceProp = {
             _service: {
-                writable: false,
-                configurable: false,
-                enumerable: false,
-                value: service,
-            },
-        };
+              writable: false,
+              configurable: false,
+              enumerable: false,
+              value: service
+            }
+          };
 
-        return Object.create(laxDataService, serviceProp);
-      },
+          return Object.create(laxDataService, serviceProp);
+        },
 
-      /**
+        /**
        * Create a component from a type and a set of attributes.
        * It accepts the name of a type of component, a map of attributes,
        * and returns {LaxPromise} to assign a callback function to notify caller.
@@ -684,15 +693,15 @@
        *   });
        * @returns {LaxPromise}
        */
-      createComponent: function createComponent(type, attributes) {
-        const promise = new Promise(function (resolve, reject) {
-          $A.createComponent(type, attributes, createComponentActionRouter(resolve, reject));
-        });
+        createComponent: function createComponent(type, attributes) {
+          var promise = new Promise(function (resolve, reject) {
+            $A.createComponent(type, attributes, createComponentActionRouter(resolve, reject));
+          });
 
-        return util.createAuraContextPromise(promise);
-      },
+          return util.createAuraContextPromise(promise);
+        },
 
-      /**
+        /**
        * Create an array of components from a list of types and attributes.
        * It accepts a list of component names and attribute maps, and returns
        * {LaxPromise} to assign a callback function to notify caller.
@@ -711,72 +720,72 @@
        *  });
        *  @return {LaxPromise}
        */
-      createComponents: function createComponents(components) {
-        const promise = new Promise(function (resolve, reject) {
-          $A.createComponents(components, createComponentActionRouter(resolve, reject));
-        });
+        createComponents: function createComponents(components) {
+          var promise = new Promise(function (resolve, reject) {
+            $A.createComponents(components, createComponentActionRouter(resolve, reject));
+          });
 
-        return util.createAuraContextPromise(promise);
-      },
+          return util.createAuraContextPromise(promise);
+        },
 
-      util: {
-        registerError: util.registerError
-      },
+        util: {
+          registerError: util.registerError
+        },
 
-      errors: errors,
-    };
+        errors: errors
+      };
 
-    return lax;
-  },
+      return lax;
+    },
 
-  defineErrors: function () {
-    function ApexActionError(message, entries, action) {
-      this.name = 'ApexActionError';
-      this.message = message;
-      this.entries = entries;
-      this.action = action;
-      this.stack = (new Error()).stack;
+    defineErrors: function () {
+      function ApexActionError(message, entries, action) {
+        this.name = 'ApexActionError';
+        this.message = message;
+        this.entries = entries;
+        this.action = action;
+        this.stack = (new Error()).stack;
+      }
+      ApexActionError.prototype = Object.create(Error.prototype);
+      ApexActionError.prototype.constructor = ApexActionError;
+
+
+      function IncompleteActionError(message, entries, action) {
+        this.name = 'IncompleteActionError';
+        this.message = message;
+        this.entries = entries;
+        this.action = action;
+        this.stack = (new Error()).stack;
+      }
+      IncompleteActionError.prototype = Object.create(Error.prototype);
+      IncompleteActionError.prototype.constructor = IncompleteActionError;
+
+      function LdsActionError(message, entries, action) {
+        this.name = 'LdsActionError';
+        this.message = message;
+        this.entries = entries;
+        this.action = action;
+        this.stack = (new Error()).stack;
+      }
+      LdsActionError.prototype = Object.create(Error.prototype);
+      LdsActionError.prototype.constructor = LdsActionError;
+
+      function CreateComponentError(message, entries, action) {
+        this.name = 'CreateComponentError';
+        this.message = message;
+        this.entries = entries;
+        this.action = action;
+        this.stack = (new Error()).stack;
+      }
+      CreateComponentError.prototype = Object.create(Error.prototype);
+      CreateComponentError.prototype.constructor = CreateComponentError;
+
+      return {
+        ApexActionError: ApexActionError,
+        IncompleteActionError: IncompleteActionError,
+        LdsActionError: LdsActionError,
+        CreateComponentError: CreateComponentError
+      };
     }
-    ApexActionError.prototype = Object.create(Error.prototype);
-    ApexActionError.prototype.constructor = ApexActionError;
-
-
-    function IncompleteActionError(message, entries, action) {
-      this.name = 'IncompleteActionError';
-      this.message = message;
-      this.entries = entries;
-      this.action = action;
-      this.stack = (new Error()).stack;
-    }
-    IncompleteActionError.prototype = Object.create(Error.prototype);
-    IncompleteActionError.prototype.constructor = IncompleteActionError;
-
-    function LdsActionError(message, entries, action) {
-      this.name = 'LdsActionError';
-      this.message = message;
-      this.entries = entries;
-      this.action = action;
-      this.stack = (new Error()).stack;
-    }
-    LdsActionError.prototype = Object.create(Error.prototype);
-    LdsActionError.prototype.constructor = LdsActionError;
-
-    function CreateComponentError(message, entries, action) {
-      this.name = 'CreateComponentError';
-      this.message = message;
-      this.entries = entries;
-      this.action = action;
-      this.stack = (new Error()).stack;
-    }
-    CreateComponentError.prototype = Object.create(Error.prototype);
-    CreateComponentError.prototype.constructor = CreateComponentError;
-
-    return {
-      ApexActionError: ApexActionError,
-      IncompleteActionError: IncompleteActionError,
-      LdsActionError: LdsActionError,
-      CreateComponentError: CreateComponentError
-    };
-  }
-});
+  });
 

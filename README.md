@@ -9,7 +9,10 @@ Lax is a Lightning Component to write a clear asynchronous JavaScript code. It h
     - Set server-side action callback (success, failure, incomplete)
     - Chain server-side actions
     - Perform multiple concurrent server-side actions
-- Construct server-side action using Builder Pattern approach
+    - Call Lightning Data Service actions (create/save/delete)
+    - Dynamically create components
+- Construct and enqueue server-side action using Builder Pattern approach
+- Construct and fire Application or Component event using Builder Pattern approach
 - Automatically wraps callback by `$A.getCallback()`
 - Use `lax` in consumer's component [aura:valueInit](https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/ref_aura_valueInit.htm) event handler
 
@@ -49,6 +52,9 @@ Enqueue an action in component's [aura:valueInit](https://developer.salesforce.c
 - `lax` [automatically defines](https://github.com/ruslan-kurchenko/sfdc-lax/blob/master/src/aura/lax/laxHelper.js#L57) a property on the consumer's component ([context](https://github.com/ruslan-kurchenko/sfdc-lax/blob/master/src/aura/lax/laxHelper.js#L35)) object
 - `lax` is ready to use in consumer's component [aura:valueInit](https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/ref_aura_valueInit.htm) event handler
 - Every consumer component has its own `lax` object. Every `lax` object [inherits](https://github.com/ruslan-kurchenko/sfdc-lax/blob/master/src/aura/lax/laxHelper.js#L47) methods from [grand parent](https://github.com/ruslan-kurchenko/sfdc-lax/blob/master/src/aura/lax/laxHelper.js#L233)
+
+## API Reference
+Navigate to component [API Reference](https://ruslan-kurchenko.github.io/sfdc-lax/) documentation to see full list of available functions and capabilities
 
 ## Examples
 
@@ -146,10 +152,97 @@ component.lax
     - `setStorable()` - set an action as a [Storable](https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/controllers_server_storable_actions.htm)
     - `setBackground()` - set an action as a [Background](https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/controllers_server_background_actions.htm)
 
-## Future plans
 
-1. Fire Application or Component event using Builder Pattern approach
-2. [Dynamically Create Component](https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/js_cb_dynamic_cmp_async.htm) functionality with Promise callbacks
+##### `lax.lds(id)` - create and return LaxDataService to execute Lightning Data Service (LDS) actions based on Promise API
+```javascript
+component.lax.lds('serviceAuraId');
+```
+
+##### `lax.lds(id).getNewRecord(sobjectType[, recordTypeId[, skipCache]])` - the function to load a record template to the LDS `targetRecord` attribute
+```javascript
+component.lax.lds('contactRecordCreator')
+  .getNewRecord('Contact')
+  .then(() => {
+    const rec = component.get("v.newContact");
+    const error = component.get("v.newContactError");
+
+    if (error || (rec === null)) {
+      console.log("Error initializing record template: " + error);
+    }
+  });
+```
+
+##### `lax.lds(id).saveRecord()` - the function to save the record that loaded to LDS in the edit `EDIT` mode
+```javascript
+component.lax.lds('recordHandler')
+  .saveRecord()
+  .then(result => {
+    // handle "SUCCESS" or "DRAFT" state
+  })
+  .error(e => {
+    // handle "ERROR" state
+  })
+  .incomplete(e => {
+    // handle "INCOMPLETE" state
+  })
+```
+
+##### `lax.lds(id).deleteRecord()` - the function to delete a record using LDS
+```javascript
+component.lax.lds('recordHandler')
+  .deleteRecord()
+  .then(result => {
+    // handle "SUCCESS" or "DRAFT" state
+  })
+  .catch(e => {
+    // handle "ERROR" or "INCOMPLETE" state. 
+    // or you can use divided handlers: .error(), .incomplete()
+  })
+```
+
+##### `lax.event(eventName)` - creates an object with `LaxEventBuilder` prototype and the context event by provided name
+```javascript
+// Fire Component Event:
+component.lax.event('sampleComponentEvent')
+  .setParams({payload: { type: 'COMPONENT'} })
+  .fire();
+
+// Fire Application Event:
+component.lax.event('e.c:AppEvent')
+  .setParams({payload: { type: 'APPLICATION'} })
+  .fire();
+```
+
+##### `lax.createComponent(type[, attributes])` - creates a component from a type and a set of attributes
+```javascript
+component.lax.createComponent('aura:text', { value: 'Single Component Creation' })
+  .then(result => {
+    // result has a property "component" with created component
+    single.set('v.body', result.component);
+  })
+  .catch(e => {
+    // handle "ERROR" or "INCOMPLETE" state
+  });
+```
+
+##### `lax.createComponent(type[, attributes])` - creates an array of components from a list of types and attributes
+```javascript
+lax.createComponents([
+    ['aura:text', { value: 'Multiple Component Creation #1'}],
+    ['aura:text', { value: 'Multiple Component Creation #2'}],
+    ['aura:text', { value: 'Multiple Component Creation #3'}]
+  ])
+  .then(result => {
+    // result has a property "components" with list of created components
+    multiple.set('v.body', result.components);
+  })
+  .incomplete(e => {
+    // handle "INCOMPLETE" state
+  })
+  .error(e => {
+    // handle "ERROR" state
+  });
+```
 
 ## License
 
