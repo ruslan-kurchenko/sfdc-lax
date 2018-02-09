@@ -91,7 +91,7 @@
      * @param reject {Function} the function called if the action is failed
      * @returns {Function}
      */
-    function actionRouter(resolve, reject) {
+    function actionRouter(resolve, reject, finallyCallback) {
       return function (response) {
         const state = response.getState();
 
@@ -108,6 +108,8 @@
           const errorConstructor = state === 'INCOMPLETE' ? errors.IncompleteActionError : errors.ApexActionError;
           reject(new errorConstructor(message, responseErrors, response));
         }
+
+        if (finallyCallback) finallyCallback();
       };
     }
 
@@ -283,7 +285,7 @@
        * @returns {LaxPromise} A {@link LaxPromise} for the completion of the callback.
        */
       error: function (onError) {
-        const fn = util.assignCatchFilters([errors.ApexActionError], onError, this);
+        const fn = util.assignCatchFilters([errors.ApexActionError, errors.CreateComponentError], onError, this);
         return this.then(undefined, fn);
       },
 
@@ -425,6 +427,17 @@
       },
 
       /**
+       * Assigns the finally callback on Aura action. This function called after success or failure callback. It doesn't
+       * depend on the result of an action.
+       * @param callback {Function}
+       * @returns {LaxActionBuilder}
+       */
+      setFinally: function setFinally(callback) {
+        this._finallyCallback = callback;
+        return this;
+      },
+
+      /**
        * Sets parameters for the action.
        * @param params {Object}
        * @returns {LaxActionBuilder}
@@ -458,7 +471,7 @@
        * @returns {void}
        */
       enqueue: function enqueue() {
-        this._action.setCallback(this._component, actionRouter(this._resolveCallback, this._rejectCallback));
+        this._action.setCallback(this._component, actionRouter(this._resolveCallback, this._rejectCallback, this._finallyCallback));
         $A.enqueueAction(this._action);
       },
 
