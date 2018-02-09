@@ -27,8 +27,7 @@
  * @namespace LaxHelper
  */
 
-"use strict";
-// eslint-disable-next-line no-unused-expressions
+// eslint-disable-next-line no-unused-expressions,strict
 (
   {
   /**
