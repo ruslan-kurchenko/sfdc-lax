@@ -1,0 +1,15 @@
+<aura:component controller="LaxExamplesController">
+    <c:lax context="{!this}"/>
+
+    <aura:attribute name="messages" type="String[]" access="private"/>
+
+    <aura:handler name="init" action="{!c.onInit}" value="{!this}"/>
+
+    <lightning:card title="Promise Finally messages:" class="slds-p-horizontal--medium">
+        <aura:iteration items="{!v.messages}"  var="msg">
+            <pre>
+                {!msg}
+            </pre>
+        </aura:iteration>
+    </lightning:card>
+</aura:component>
