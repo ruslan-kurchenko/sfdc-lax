@@ -6,11 +6,23 @@
     </types>
     <types>
         <members>ActionBuilderComponent</members>
+        <members>AppEvent</members>
+        <members>AppEventEmiterComponent</members>
         <members>ChainActionsComponent</members>
+        <members>CmpEventEmiterComponent</members>
+        <members>CompEvent</members>
         <members>ContactList</members>
+        <members>CreateCmpComponent</members>
         <members>EnqueueAllComponent</members>
+        <members>EventsHandlerComponent</members>
         <members>ExceptionComponent</members>
+        <members>IncompleteComponent</members>
+        <members>LDSCreatingComponent</members>
+        <members>LDSDeletingComponent</members>
+        <members>LDSLoadingComponent</members>
+        <members>LDSSavingComponent</members>
         <members>LaxExampleApplication</members>
+        <members>PromiseFinallyComponent</members>
         <members>ResolveComponent</members>
         <members>lax</members>
         <name>AuraDefinitionBundle</name>

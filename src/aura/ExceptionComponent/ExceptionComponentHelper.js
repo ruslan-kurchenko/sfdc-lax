@@ -21,6 +21,7 @@
     function CustomClientError(message) {
       this.name = 'CustomClientError';
       this.message = message;
+      this.stack = (new Error()).stack;
     }
     CustomClientError.prototype = Object.create(Error.prototype);
     CustomClientError.prototype.constructor = CustomClientError;
@@ -35,7 +36,7 @@
         throw new CustomClientError('This is custom client message');
       })
       .catch(errors.CustomClientError, (e) => {
-        console.log(e.message);
+        console.log('CustomClientError', e);
       })
   },
 

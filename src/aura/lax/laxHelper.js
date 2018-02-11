@@ -276,7 +276,21 @@
        * @returns {LaxPromise}
        */
       finally: function (callback) {
-        var promise = this._contextPromise.finally(callback);
+        var self = this,
+          promise;
+        
+        if (typeof Promise.prototype.finally === 'function') {
+          promise = self._contextPromise.finally($A.getCallback(callback));
+        } else {
+          promise = this
+            .then(function(value) {
+              return self._contextPromise.constructor.resolve($A.getCallback(callback)()).then(function() { return value; });
+            })
+            .catch(function(reason) {
+              return self._contextPromise.constructor.resolve($A.getCallback(callback)()).then(function() { throw reason; });
+            });
+        }
+
         return util.createAuraContextPromise(promise);
       },
 
