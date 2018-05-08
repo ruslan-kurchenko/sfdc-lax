@@ -50,15 +50,16 @@
       // the Lax object due to prototype inheritance
       var lax = Object.create(this.getLax(), laxProps);
 
-      // Create Lax property on the context component object that is refer on
+      // Create property on the context component object that is refer on
       // newly created Lax object
+      var contextComponentAttribute = component.get('v.attributeName');
       var componentProps = {
         writable: false,
         configurable: false,
         enumerable: false,
         value: lax
       };
-      Object.defineProperty(contextComponent, 'lax', componentProps);
+      Object.defineProperty(contextComponent, contextComponentAttribute, componentProps);
     },
 
     /**
