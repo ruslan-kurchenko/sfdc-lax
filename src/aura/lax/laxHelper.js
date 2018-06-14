@@ -171,6 +171,17 @@
           return Object.assign(lp, laxPromise);
         },
 
+        removeAuraErrorMessagePrefix: function (message) {
+          var result = message;
+          var prefix = 'Error in $A.getCallback() [';
+
+          if (message && message.indexOf(prefix) > -1) {
+              result = message.replace(prefix, '').slice(0, -1)
+          }
+
+          return result;
+        },
+
         assignCatchFilters: function (handleErrors, callback, promise) {
           return function routeError(error) {
             for (var i = 0; i < handleErrors.length; i = i + 1) {
@@ -248,6 +259,7 @@
        */
       catch: function (onError) {
         var promise;
+        var callback = onError;
         var len = arguments.length;
         if (len > 1) {
           var errorTypes = new Array(len - 1);
@@ -256,11 +268,13 @@
           }
           var onErrorCallback = arguments[len - 1];
 
-          var filteredOnReject = util.assignCatchFilters(errorTypes, onErrorCallback, this);
-          promise = this.then(undefined, filteredOnReject);
-        } else {
-          promise = this.then(undefined, onError);
+          callback = util.assignCatchFilters(errorTypes, onErrorCallback, this);
         }
+
+        promise = this.then(undefined, function(e) {
+          e.message = util.removeAuraErrorMessagePrefix(e.message);
+          return callback(e);
+        });
 
         return util.createAuraContextPromise(promise);
       },
