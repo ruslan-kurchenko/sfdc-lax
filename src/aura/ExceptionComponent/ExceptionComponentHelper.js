@@ -1,5 +1,14 @@
 ({
   callServer: function (component) {
+    function CustomClientError(message) {
+      this.name = 'CustomClientError';
+      this.message = message;
+      this.stack = (new Error()).stack;
+    }
+    CustomClientError.prototype = Object.create(Error.prototype);
+    CustomClientError.prototype.constructor = CustomClientError;
+    component.lax.util.registerError(CustomClientError);
+
     const errors = component.lax.errors;
     component.lax
       .enqueue('c.throwAuraHandledException')
@@ -16,20 +25,7 @@
       .catch(e => {
         this.updateMessages(component, e.entries.map(er => er.message));
         console.log('IndexOfBoundException', e);
-      });
 
-    function CustomClientError(message) {
-      this.name = 'CustomClientError';
-      this.message = message;
-      this.stack = (new Error()).stack;
-    }
-    CustomClientError.prototype = Object.create(Error.prototype);
-    CustomClientError.prototype.constructor = CustomClientError;
-    component.lax.util.registerError(CustomClientError);
-
-    component.lax
-      .enqueue('c.throwAuraHandledException')
-      .catch(e => {
         console.log('AuraHandledException', e);
         this.updateMessages(component, e.entries.map(er => er.message));
 
@@ -37,7 +33,9 @@
       })
       .catch(errors.CustomClientError, (e) => {
         console.log('CustomClientError', e);
-      })
+
+        this.updateMessages(component, [e.message]);
+      });
   },
 
   updateMessages: function (component, messages) {

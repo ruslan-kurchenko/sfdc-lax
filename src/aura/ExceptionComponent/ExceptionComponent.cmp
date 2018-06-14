@@ -7,7 +7,10 @@
 
     <lightning:card title="Exception" class="slds-p-horizontal--medium">
         <pre>
-            Exception messages: {!join(',', v.messages)}
+        Exception messages:
+        <aura:iteration items="{!v.messages}" var="msg">
+        {!msg}<br />
+        </aura:iteration>
         </pre>
 
         <lightning:button onclick="{!c.onCallServer}" label="Call Server" />
