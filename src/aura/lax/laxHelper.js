@@ -36,7 +36,9 @@
    * @param component {Object} - the lax component object
    */
     init: function init(component) {
-      var contextComponent = component.get('v.context');
+      var helper = this,
+        contextComponent = component.get('v.context');
+
       var laxProps = {
         _component: {
           writable: false,
@@ -46,9 +48,20 @@
         }
       };
 
+      var laxPrototype = this.getLax(function(globalEventListeners) {
+        helper.initEventListeners(globalEventListeners, component, 'v.onPrototypeInit');
+      });
+
+      var localEventListeners = {};
+      helper.initEventListeners(localEventListeners, component, 'v.onInit');
+
       // Create an object that is inherit all the functionality from
       // the Lax object due to prototype inheritance
-      var lax = Object.create(this.getLax(), laxProps);
+      var lax = Object.create(laxPrototype, laxProps);
+
+      lax.getEventListeners = function () {
+        return localEventListeners;
+      };
 
       // Create property on the context component object that is refer on
       // newly created Lax object
@@ -69,9 +82,9 @@
    * @memberOf LaxHelper#
    * @returns {Lax}
    */
-    getLax: function getLax() {
+    getLax: function getLax(onInit) {
       if (!this._lax) {
-        this._lax = this.createLax();
+        this._lax = this.createLax(onInit);
       }
 
       return this._lax;
@@ -83,10 +96,11 @@
    * @memberOf LaxHelper#
    * @returns {Lax}
    */
-    createLax: function createLax() {
+    createLax: function createLax(onInit) {
       var helper = this;
 
       var errors = helper.defineErrors();
+      var eventListeners = {};
 
       /**
      * Creates a unified function to be assign as a callback on the aura action.
@@ -95,11 +109,28 @@
      * @returns {Function}
      */
       function actionRouter(resolve, reject, finallyCallback) {
+        var lax = this;
+
         return function (response) {
-          var state = response.getState();
+          var state = response.getState(),
+            localListeners = lax.getEventListeners(),
+            prototypeListeners = laxPrototype.getEventListeners(),
+            successListeners = [],
+            errorListeners = [];
 
           if (state === 'SUCCESS') {
-            resolve(response.getReturnValue());
+            util.pushIfNotUndefinedOrNull(
+              successListeners,
+              util.delve(localListeners, 'apexAction.onSuccess')
+            );
+            util.pushIfNotUndefinedOrNull(
+              successListeners,
+              util.delve(prototypeListeners, 'apexAction.onSuccess')
+            );
+
+            resolve(successListeners.reduce(function (returnValue, listener) {
+              return listener(returnValue);
+            }, response.getReturnValue()));
           } else {
             var message = 'Unknown error';
 
@@ -109,7 +140,19 @@
             }
 
             var errorConstructor = state === 'INCOMPLETE' ? errors.IncompleteActionError : errors.ApexActionError;
-            reject(new errorConstructor(message, responseErrors, response));
+
+            util.pushIfNotUndefinedOrNull(
+              errorListeners,
+              util.delve(localListeners, 'apexAction.onError')
+            );
+            util.pushIfNotUndefinedOrNull(
+              errorListeners,
+              util.delve(prototypeListeners, 'apexAction.onError')
+            );
+
+            reject(errorListeners.reduce(function (err, listener) {
+              return listener(err);
+            }, new errorConstructor(message, responseErrors, response)));
           }
 
           if (finallyCallback) {
@@ -205,6 +248,20 @@
 
         isApplicationEvent: function (eventName) {
           return eventName.indexOf('e.') === 0 && eventName.indexOf(':') > 0;
+        },
+
+        /**
+         * @link https://github.com/developit/dlv
+         */
+        delve: function (obj, key, def, p) {
+          p = 0;
+          key = key.split ? key.split('.') : key;
+          while (obj && p < key.length) obj = obj[key[p++]];
+          return (obj === undefined || p < key.length) ? def : obj;
+        },
+
+        pushIfNotUndefinedOrNull: function (arr, value) {
+          if (!$A.util.isUndefinedOrNull(value)) arr.push(value);
         }
       };
 
@@ -490,7 +547,7 @@
        */
       enqueue: function enqueue() {
         this._action.setCallback(this._component,
-          actionRouter(this._resolveCallback, this._rejectCallback, this._finallyCallback));
+          actionRouter.call(this._lax, this._resolveCallback, this._rejectCallback, this._finallyCallback));
         $A.enqueueAction(this._action);
       }
 
@@ -547,7 +604,7 @@
      * created in the application. See <code>init</code> function of the laxHelper.js where the lax assigned as prototype.
      * @class Lax
      */
-      var lax =
+      var laxPrototype =
       /**
        * @lends Lax#
        */
@@ -584,7 +641,7 @@
               }
             }
 
-            action.setCallback(self._component, actionRouter(resolve, reject));
+            action.setCallback(self._component, actionRouter.call(self, resolve, reject));
             $A.enqueueAction(action);
           });
 
@@ -651,6 +708,12 @@
               configurable: false,
               enumerable: false,
               value: c.get(actionName)
+            },
+            _lax: {
+              writable: false,
+              configurable: false,
+              enumerable: false,
+              value: this
             }
           };
           return Object.create(laxActionBuilder, props);
@@ -742,6 +805,10 @@
           return util.createAuraContextPromise(promise);
         },
 
+        getEventListeners: function () {
+          return eventListeners;
+        },
+
         util: {
           registerError: util.registerError
         },
@@ -749,7 +816,25 @@
         errors: errors
       };
 
-      return lax;
+      if (onInit) {
+        // callback to decorate events workflow (ApexAction)
+        onInit(eventListeners);
+      }
+
+      return laxPrototype;
+    },
+
+    initEventListeners: function (listenersContainer, component, auraActionName) {
+      var action = component.get(auraActionName);
+      if (action) {
+        action.setCallback(component, function (response) {
+          var listeners = response.getReturnValue();
+          if (listeners && listeners.apexAction) {
+            listenersContainer.apexAction = listeners.apexAction;
+          }
+        });
+        $A.enqueueAction(action);
+      }
     },
 
     defineErrors: function () {

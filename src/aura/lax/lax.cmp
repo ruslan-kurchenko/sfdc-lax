@@ -24,6 +24,8 @@
 <aura:component>
     <aura:attribute name="context" type="Object" required="true" description="Consumer's component object"/>
     <aura:attribute name="attributeName" type="String" default="lax" description="Controls dynamic attribute name generated on consumer's component object"/>
+    <aura:attribute name="onPrototypeInit" type="Aura.Action" />
+    <aura:attribute name="onInit" type="Aura.Action" />
 
     <aura:handler name="init" value="{!this}" action="{!c.onInit}"/>
 </aura:component>
