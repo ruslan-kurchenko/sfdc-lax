@@ -876,8 +876,8 @@
       if (action) {
         action.setCallback(component, function (response) {
           var listeners = response.getReturnValue();
-          if (listeners && listeners.apexAction) {
-            listenersContainer.apexAction = listeners.apexAction;
+          if (listeners) {
+            Object.assign(listenersContainer, listeners);
           }
         });
         $A.enqueueAction(action);
