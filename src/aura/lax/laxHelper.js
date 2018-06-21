@@ -49,11 +49,11 @@
       };
 
       var laxPrototype = this.getLax(function(globalEventListeners) {
-        helper.initEventListeners(globalEventListeners, component, 'v.onPrototypeInit');
+        helper.initEventListeners(globalEventListeners, contextComponent, 'onLaxPrototypeInit');
       });
 
       var localEventListeners = {};
-      helper.initEventListeners(localEventListeners, component, 'v.onInit');
+      helper.initEventListeners(localEventListeners, contextComponent, 'onLaxInit');
 
       // Create an object that is inherit all the functionality from
       // the Lax object due to prototype inheritance
@@ -871,16 +871,10 @@
       return laxPrototype;
     },
 
-    initEventListeners: function (listenersContainer, component, auraActionName) {
-      var action = component.get(auraActionName);
-      if (action) {
-        action.setCallback(component, function (response) {
-          var listeners = response.getReturnValue();
-          if (listeners && listeners.apexAction) {
-            listenersContainer.apexAction = listeners.apexAction;
-          }
-        });
-        $A.enqueueAction(action);
+    initEventListeners: function (listenersContainer, component, auraMethodName) {
+      var method = component[auraMethodName];
+      if (method) {
+        Object.assign(listenersContainer, method.call(component));
       }
     },
 
