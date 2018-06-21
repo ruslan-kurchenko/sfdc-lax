@@ -1,5 +1,5 @@
 <aura:component controller="LaxExamplesController">
-    <c:lax context="{!this}"/>
+    <c:lax context="{!this}" onInit="{!c.onLaxInit}" />
 
     <aura:attribute name="messages" type="String[]" access="private"/>
 

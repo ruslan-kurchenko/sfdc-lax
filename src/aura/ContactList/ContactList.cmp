@@ -1,5 +1,5 @@
 <aura:component controller="LaxExamplesController">
-    <c:lax context="{!this}" onInit="{!c.onLaxInit}" onPrototypeInit="{!c.onLaxPrototypeInit}"/>
+    <c:lax context="{!this}" onInit="{!c.onLaxInit}" />
 
     <aura:attribute name="records" type="Contact[]" access="private"/>
 
