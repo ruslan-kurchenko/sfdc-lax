@@ -36,7 +36,9 @@
    * @param component {Object} - the lax component object
    */
     init: function init(component) {
-      var contextComponent = component.get('v.context');
+      var helper = this,
+        contextComponent = component.get('v.context');
+
       var laxProps = {
         _component: {
           writable: false,
@@ -46,9 +48,23 @@
         }
       };
 
+      // Create/Get Lax Prototype. Assign listeners onInit stage (when it creates a record)
+      var laxPrototype = this.getLax(function(globalEventListeners) {
+        helper.initEventListeners(globalEventListeners, contextComponent, 'onLaxPrototypeInit');
+      });
+
+      // Init and assign Local event listeners for prototype child
+      var localEventListeners = {};
+      helper.initEventListeners(localEventListeners, contextComponent, 'onLaxInit');
+
       // Create an object that is inherit all the functionality from
       // the Lax object due to prototype inheritance
-      var lax = Object.create(this.getLax(), laxProps);
+      var lax = Object.create(laxPrototype, laxProps);
+
+      // Override the function on a child Lax object to get Local Listeners
+      lax.getEventListeners = function () {
+        return localEventListeners;
+      };
 
       // Create property on the context component object that is refer on
       // newly created Lax object
@@ -67,11 +83,12 @@
    * Helpers of Aura components are static, it allows to share prototype
    * Lax object on a helper instance.
    * @memberOf LaxHelper#
+   * @param onInit {Function} the function to handle init stage of the prototype creation process
    * @returns {Lax}
    */
-    getLax: function getLax() {
+    getLax: function getLax(onInit) {
       if (!this._lax) {
-        this._lax = this.createLax();
+        this._lax = this.createLax(onInit);
       }
 
       return this._lax;
@@ -83,23 +100,52 @@
    * @memberOf LaxHelper#
    * @returns {Lax}
    */
-    createLax: function createLax() {
+    createLax: function createLax(onInit) {
       var helper = this;
 
-      var errors = helper.defineErrors();
+      var errors = helper.defineErrors(),
+        eventListeners = {};
+
+      /**
+     * The function gets the list of listeners and uses them to process the value that was passed.
+     * The main logic is to pass the value through the chain of listeners and return as a result.
+     * @param listOfListeners {Object} - listeners to call on a value
+     * @param eventName {String} - the name of a event name name that should be used to get listeners
+     * @param value - the actual value to process by listeners
+     * @returns {T | any} - processed by listeners value
+     */
+      function getProcessedValueByListeners(listOfListeners, eventName, value) {
+        return util
+          .getEventListenersByName(listOfListeners, eventName)
+          .reduce(function (val, listener) {
+            return listener(val);
+          }, value);
+      }
 
       /**
      * Creates a unified function to be assign as a callback on the aura action.
      * @param resolve {Function} the function called if the action is success
      * @param reject {Function} the function called if the action is failed
+     * @param finallyCallback {Function} if set, the function called called after success or failure callback
      * @returns {Function}
      */
       function actionRouter(resolve, reject, finallyCallback) {
+        var lax = this;
+
         return function (response) {
-          var state = response.getState();
+          var state = response.getState(),
+            listOfListeners = [
+              laxPrototype.getEventListeners(), lax.getEventListeners()
+            ];
 
           if (state === 'SUCCESS') {
-            resolve(response.getReturnValue());
+            var resultValue = getProcessedValueByListeners(
+              listOfListeners,
+              'apexAction.onSuccess',
+              response.getReturnValue()
+            );
+
+            resolve(resultValue);
           } else {
             var message = 'Unknown error';
 
@@ -109,7 +155,14 @@
             }
 
             var errorConstructor = state === 'INCOMPLETE' ? errors.IncompleteActionError : errors.ApexActionError;
-            reject(new errorConstructor(message, responseErrors, response));
+            
+            var err = getProcessedValueByListeners(
+              listOfListeners,
+              'apexAction.onError',
+              new errorConstructor(message, responseErrors, response)
+            );
+
+            reject(err);
           }
 
           if (finallyCallback) {
@@ -125,9 +178,15 @@
      * @returns {Function}
      */
       function createComponentActionRouter(resolve, reject) {
+        var lax = this;
+
         return function (component, status, message) {
-          var result = { status: status };
-          var isMultiple = $A.util.isArray(message);
+          var result = { status: status },
+            isMultiple = $A.util.isArray(message),
+            listOfListeners = [
+              laxPrototype.getEventListeners(), lax.getEventListeners()
+            ];
+
           if (isMultiple) {
             result.components = component;
             result.statusMessages = message;
@@ -137,16 +196,82 @@
           }
 
           if (status === 'SUCCESS') {
-            resolve(component);
+            var resultComponent = getProcessedValueByListeners(
+              listOfListeners,
+              'createComponentAction.onSuccess',
+              component
+            );
+
+            resolve(resultComponent);
           } else {
-            var errorConstructor = status === 'INCOMPLETE' ? errors.IncompleteActionError : errors.CreateComponentError;
+            var errorConstructor = status === 'INCOMPLETE' ? errors.IncompleteActionError : errors.CreateComponentError,
+              error = null;
 
             if (isMultiple) {
               var msg = 'An error occurred while a component creation process.';
-              reject(new errorConstructor(msg, result.statusMessages, result));
+              error = new errorConstructor(msg, result.statusMessages, result);
             } else {
-              reject(new errorConstructor(message, null, result));
+              error = new errorConstructor(message, null, result);
             }
+
+            var resultError = getProcessedValueByListeners(
+              listOfListeners,
+              'createComponentAction.onError',
+              error
+            );
+
+            reject(resultError);
+          }
+        };
+      }
+
+
+      /**
+       * Creates a unified function to assign it as a callback on the LDS action.
+       * The returned function is a router for the result of the action.
+       * @param resolve {Function} the function called if the action is success
+       * @param reject {Function} the function called if the action is failed
+       * @returns {Function}
+       */
+      function ldsActionRouter(resolve, reject) {
+        var lax = this;
+
+        return function(result) {
+          var listOfListeners = [
+              laxPrototype.getEventListeners(), lax.getEventListeners()
+            ];
+
+          if (result.state === 'SUCCESS' || result.state === 'DRAFT') {
+            var resultValue = getProcessedValueByListeners(
+              listOfListeners,
+              'ldsAction.onSuccess',
+              result
+            );
+
+            resolve(resultValue);
+          } else {
+            var error = null;
+            if (result.state === 'ERROR') {
+              var message = 'Unknown error';
+
+              if (result.error && Array.isArray(result.error) && result.error.length > 0) {
+                message = result.error[0].message;
+              }
+
+              error = new errors.LdsActionError(message, result.error, result);
+            } else if (result.state === 'INCOMPLETE') {
+              error = new errors.IncompleteActionError('You are currently offline.', result.error, result);
+            } else {
+              error = new Error('Unknown action state');
+            }
+
+            var resultError = getProcessedValueByListeners(
+              listOfListeners,
+              'ldsAction.onError',
+              error
+            );
+
+            reject(resultError);
           }
         };
       }
@@ -205,6 +330,34 @@
 
         isApplicationEvent: function (eventName) {
           return eventName.indexOf('e.') === 0 && eventName.indexOf(':') > 0;
+        },
+
+        getEventListenersByName: function (listOfListeners, eventName) {
+          var callbacks = [];
+
+          listOfListeners.forEach(function (listeners) {
+            util.pushIfValueExist(
+              callbacks,
+              util.delve(listeners, eventName)
+            );
+          });
+
+          return callbacks;
+        },
+
+        /**
+         * The error safe function to get a nested property on the object
+         * @link https://github.com/developit/dlv
+         */
+        delve: function (obj, key, def, p) {
+          p = 0;
+          key = key.split ? key.split('.') : key;
+          while (obj && p < key.length) obj = obj[key[p++]];
+          return (obj === undefined || p < key.length) ? def : obj;
+        },
+
+        pushIfValueExist: function (arr, value) {
+          if (!$A.util.isUndefinedOrNull(value)) arr.push(value);
         }
       };
 
@@ -319,35 +472,6 @@
     };
 
       /**
-     * Creates a unified function to assign it as a callback on the LDS action.
-     * The returned function is a router for the result of the action.
-     * @param resolve {Function} the function called if the action is success
-     * @param reject {Function} the function called if the action is failed
-     * @returns {Function}
-     */
-      function ldsActionRouter(resolve, reject) {
-        return function(result) {
-          var message;
-          if (result.state === 'SUCCESS' || result.state === 'DRAFT') {
-            resolve(result);
-          } else if (result.state === 'ERROR') {
-            message = 'Unknown error';
-
-            if (result.error && Array.isArray(result.error) && result.error.length > 0) {
-              message = result.error[0].message;
-            }
-
-            reject(new errors.LdsActionError(message, result.error, result));
-          } else if (result.state === 'INCOMPLETE') {
-            message = 'You are currently offline.';
-            reject(new errors.IncompleteActionError(message, result.error, result));
-          } else {
-            reject(new Error('Unknown action state'));
-          }
-        };
-      }
-
-      /**
      * The container of the actual Lightning Data Service (LDS). It delegates
      * actions to LDS and provide and API to chain them. Actions callback functions don't
      * require <code>$A.getCallback()</code> wrapper.
@@ -368,7 +492,7 @@
       saveRecord: function () {
         var self = this;
         var promise = new Promise(function (resolve, reject) {
-          self._service.saveRecord(ldsActionRouter(resolve, reject));
+          self._service.saveRecord(ldsActionRouter.call(self, resolve, reject));
         });
 
         return util.createAuraContextPromise(promise);
@@ -405,7 +529,7 @@
       deleteRecord: function () {
         var self = this;
         var promise = new Promise(function (resolve, reject) {
-          self._service.deleteRecord(ldsActionRouter(resolve, reject));
+          self._service.deleteRecord(ldsActionRouter.call(self, resolve, reject));
         });
 
         return util.createAuraContextPromise(promise);
@@ -490,7 +614,7 @@
        */
       enqueue: function enqueue() {
         this._action.setCallback(this._component,
-          actionRouter(this._resolveCallback, this._rejectCallback, this._finallyCallback));
+          actionRouter.call(this._lax, this._resolveCallback, this._rejectCallback, this._finallyCallback));
         $A.enqueueAction(this._action);
       }
 
@@ -547,7 +671,7 @@
      * created in the application. See <code>init</code> function of the laxHelper.js where the lax assigned as prototype.
      * @class Lax
      */
-      var lax =
+      var laxPrototype =
       /**
        * @lends Lax#
        */
@@ -584,7 +708,7 @@
               }
             }
 
-            action.setCallback(self._component, actionRouter(resolve, reject));
+            action.setCallback(self._component, actionRouter.call(self, resolve, reject));
             $A.enqueueAction(action);
           });
 
@@ -651,6 +775,12 @@
               configurable: false,
               enumerable: false,
               value: c.get(actionName)
+            },
+            _lax: {
+              writable: false,
+              configurable: false,
+              enumerable: false,
+              value: this
             }
           };
           return Object.create(laxActionBuilder, props);
@@ -708,8 +838,9 @@
        * @returns {LaxPromise}
        */
         createComponent: function createComponent(type, attributes) {
+          var self = this;
           var promise = new Promise(function (resolve, reject) {
-            $A.createComponent(type, attributes, createComponentActionRouter(resolve, reject));
+            $A.createComponent(type, attributes, createComponentActionRouter.call(self, resolve, reject));
           });
 
           return util.createAuraContextPromise(promise);
@@ -735,11 +866,16 @@
        *  @return {LaxPromise}
        */
         createComponents: function createComponents(components) {
+          var self = this;
           var promise = new Promise(function (resolve, reject) {
-            $A.createComponents(components, createComponentActionRouter(resolve, reject));
+            $A.createComponents(components, createComponentActionRouter.call(self, resolve, reject));
           });
 
           return util.createAuraContextPromise(promise);
+        },
+
+        getEventListeners: function () {
+          return eventListeners;
         },
 
         util: {
@@ -749,7 +885,19 @@
         errors: errors
       };
 
-      return lax;
+      if (onInit) {
+        // callback to decorate events workflow (ApexAction)
+        onInit(eventListeners);
+      }
+
+      return laxPrototype;
+    },
+
+    initEventListeners: function (listenersContainer, component, auraMethodName) {
+      var method = component[auraMethodName];
+      if (method) {
+        Object.assign(listenersContainer, method.call(component));
+      }
     },
 
     defineErrors: function () {
