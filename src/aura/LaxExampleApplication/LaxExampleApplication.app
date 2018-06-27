@@ -1,4 +1,7 @@
 <aura:application extends="force:slds">
+    <c:lax context="{!this}" />
+    <aura:method name="onLaxPrototypeInit" action="{!c.onLaxPrototypeInit}" />
+
     <div class="slds-grid--vertical slds-grid--align-space slds-grid--vertical-align-top">
         <c:ContactList />
         <c:ChainActionsComponent />

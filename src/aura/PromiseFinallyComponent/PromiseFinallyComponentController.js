@@ -1,5 +1,7 @@
 ({
   onInit: function (component, event, helper) {
+    const errors = component.lax.errors;
+    
     // Finally after .then()
     component.lax
       .enqueue('c.getContacts')
@@ -11,7 +13,6 @@
         helper.updateMessages(component, ['Success: Finally call after c.getContacts'])
       });
 
-    // Finally after .catch()
     component.lax
       .enqueue('c.throwAuraHandledException')
       .then(() => {
