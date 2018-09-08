@@ -25,7 +25,7 @@ Click on the button below to deploy the component to the org
 ## Usage
 
 Define `lax` component in a custom component markup:
-```html
+```xml
 <!-- ContactsComponent.cmp -->
 <aura:component controller="LaxExamplesController">
     <!-- Define lax component and pass consumer's component object as a context attribute (required) -->
