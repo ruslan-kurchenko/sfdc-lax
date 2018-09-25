@@ -1,0 +1,13 @@
+<aura:component controller="LaxExamplesController">
+    <c:lax context="{!this}" />
+
+    <aura:attribute name="value" type="String" access="private"/>
+
+    <aura:handler name="init" action="{!c.onInit}" value="{!this}" />
+
+    <lightning:card title="AsyncAwaitComponent" class="slds-p-horizontal--medium">
+        <pre>
+            Value = {!v.value}
+        </pre>
+    </lightning:card>
+</aura:component>
