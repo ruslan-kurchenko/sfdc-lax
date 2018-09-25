@@ -48,12 +48,10 @@
         }
       };
 
-      // Create/Get Lax Prototype. Assign listeners onInit stage (when it creates a record)
       var laxPrototype = this.getLax(function(globalEventListeners) {
         helper.initEventListeners(globalEventListeners, contextComponent, 'onLaxPrototypeInit');
       });
 
-      // Init and assign Local event listeners for prototype child
       var localEventListeners = {};
       helper.initEventListeners(localEventListeners, contextComponent, 'onLaxInit');
 
@@ -61,7 +59,6 @@
       // the Lax object due to prototype inheritance
       var lax = Object.create(laxPrototype, laxProps);
 
-      // Override the function on a child Lax object to get Local Listeners
       lax.getEventListeners = function () {
         return localEventListeners;
       };
@@ -83,7 +80,6 @@
    * Helpers of Aura components are static, it allows to share prototype
    * Lax object on a helper instance.
    * @memberOf LaxHelper#
-   * @param onInit {Function} the function to handle init stage of the prototype creation process
    * @returns {Lax}
    */
     getLax: function getLax(onInit) {
@@ -103,30 +99,13 @@
     createLax: function createLax(onInit) {
       var helper = this;
 
-      var errors = helper.defineErrors(),
-        eventListeners = {};
-
-      /**
-     * The function gets the list of listeners and uses them to process the value that was passed.
-     * The main logic is to pass the value through the chain of listeners and return as a result.
-     * @param listOfListeners {Object} - listeners to call on a value
-     * @param eventName {String} - the name of a event name name that should be used to get listeners
-     * @param value - the actual value to process by listeners
-     * @returns {T | any} - processed by listeners value
-     */
-      function getProcessedValueByListeners(listOfListeners, eventName, value) {
-        return util
-          .getEventListenersByName(listOfListeners, eventName)
-          .reduce(function (val, listener) {
-            return listener(val);
-          }, value);
-      }
+      var errors = helper.defineErrors();
+      var eventListeners = {};
 
       /**
      * Creates a unified function to be assign as a callback on the aura action.
      * @param resolve {Function} the function called if the action is success
      * @param reject {Function} the function called if the action is failed
-     * @param finallyCallback {Function} if set, the function called called after success or failure callback
      * @returns {Function}
      */
       function actionRouter(resolve, reject, finallyCallback) {
@@ -139,11 +118,11 @@
             ];
 
           if (state === 'SUCCESS') {
-            var resultValue = getProcessedValueByListeners(
-              listOfListeners,
-              'apexAction.onSuccess',
-              response.getReturnValue()
-            );
+            var resultValue = util
+              .getEventListenersByName(listOfListeners, 'apexAction.onSuccess')
+              .reduce(function (val, listener) {
+                return listener(val);
+              }, response.getReturnValue());
 
             resolve(resultValue);
           } else {
@@ -155,12 +134,12 @@
             }
 
             var errorConstructor = state === 'INCOMPLETE' ? errors.IncompleteActionError : errors.ApexActionError;
-            
-            var err = getProcessedValueByListeners(
-              listOfListeners,
-              'apexAction.onError',
-              new errorConstructor(message, responseErrors, response)
-            );
+
+            var err = util
+              .getEventListenersByName(listOfListeners, 'apexAction.onError')
+              .reduce(function (err, listener) {
+                return listener(err);
+              }, new errorConstructor(message, responseErrors, response));
 
             reject(err);
           }
@@ -196,11 +175,11 @@
           }
 
           if (status === 'SUCCESS') {
-            var resultComponent = getProcessedValueByListeners(
-              listOfListeners,
-              'createComponentAction.onSuccess',
-              component
-            );
+            var resultComponent = util
+              .getEventListenersByName(listOfListeners, 'createComponentAction.onSuccess')
+              .reduce(function (cmp, listener) {
+                return listener(cmp)
+              }, component);
 
             resolve(resultComponent);
           } else {
@@ -214,11 +193,11 @@
               error = new errorConstructor(message, null, result);
             }
 
-            var resultError = getProcessedValueByListeners(
-              listOfListeners,
-              'createComponentAction.onError',
-              error
-            );
+            var resultError = util
+              .getEventListenersByName(listOfListeners, 'createComponentAction.onError')
+              .reduce(function (e, listener) {
+                return listener(e);
+              }, error);
 
             reject(resultError);
           }
@@ -242,11 +221,11 @@
             ];
 
           if (result.state === 'SUCCESS' || result.state === 'DRAFT') {
-            var resultValue = getProcessedValueByListeners(
-              listOfListeners,
-              'ldsAction.onSuccess',
-              result
-            );
+            var resultValue = util
+              .getEventListenersByName(listOfListeners, 'ldsAction.onSuccess')
+              .reduce(function (val, listener) {
+                return listener(val);
+              }, result);
 
             resolve(resultValue);
           } else {
@@ -265,11 +244,11 @@
               error = new Error('Unknown action state');
             }
 
-            var resultError = getProcessedValueByListeners(
-              listOfListeners,
-              'ldsAction.onError',
-              error
-            );
+            var resultError = util
+              .getEventListenersByName(listOfListeners, 'ldsAction.onError')
+              .reduce(function (e, listener) {
+                return listener(e);
+              }, error);
 
             reject(resultError);
           }
@@ -343,21 +322,20 @@
           return eventName.indexOf('e.') === 0 && eventName.indexOf(':') > 0;
         },
 
-        getEventListenersByName: function (listOfListeners, eventName) {
-          var callbacks = [];
+        getEventListenersByName: function (listOfListeners, eventHandlerName) {
+          var handlers = [];
 
           listOfListeners.forEach(function (listeners) {
             util.pushIfValueExist(
-              callbacks,
-              util.delve(listeners, eventName)
+              handlers,
+              util.delve(listeners, eventHandlerName)
             );
           });
 
-          return callbacks;
+          return handlers;
         },
 
         /**
-         * The error safe function to get a nested property on the object
          * @link https://github.com/developit/dlv
          */
         delve: function (obj, key, def, p) {
@@ -923,7 +901,6 @@
         this.stack = (new Error()).stack;
       }
       ApexActionError.prototype = Object.create(Error.prototype);
-      ApexActionError.prototype.constructor = ApexActionError;
 
 
       function IncompleteActionError(message, entries, action) {
@@ -934,7 +911,6 @@
         this.stack = (new Error()).stack;
       }
       IncompleteActionError.prototype = Object.create(Error.prototype);
-      IncompleteActionError.prototype.constructor = IncompleteActionError;
 
       function LdsActionError(message, entries, action) {
         this.name = 'LdsActionError';
@@ -944,7 +920,6 @@
         this.stack = (new Error()).stack;
       }
       LdsActionError.prototype = Object.create(Error.prototype);
-      LdsActionError.prototype.constructor = LdsActionError;
 
       function CreateComponentError(message, entries, action) {
         this.name = 'CreateComponentError';
@@ -954,7 +929,6 @@
         this.stack = (new Error()).stack;
       }
       CreateComponentError.prototype = Object.create(Error.prototype);
-      CreateComponentError.prototype.constructor = CreateComponentError;
 
       return {
         ApexActionError: ApexActionError,
