@@ -901,7 +901,6 @@
         this.stack = (new Error()).stack;
       }
       ApexActionError.prototype = Object.create(Error.prototype);
-      ApexActionError.prototype.constructor = ApexActionError;
 
 
       function IncompleteActionError(message, entries, action) {
@@ -912,7 +911,6 @@
         this.stack = (new Error()).stack;
       }
       IncompleteActionError.prototype = Object.create(Error.prototype);
-      IncompleteActionError.prototype.constructor = IncompleteActionError;
 
       function LdsActionError(message, entries, action) {
         this.name = 'LdsActionError';
@@ -922,7 +920,6 @@
         this.stack = (new Error()).stack;
       }
       LdsActionError.prototype = Object.create(Error.prototype);
-      LdsActionError.prototype.constructor = LdsActionError;
 
       function CreateComponentError(message, entries, action) {
         this.name = 'CreateComponentError';
@@ -932,7 +929,6 @@
         this.stack = (new Error()).stack;
       }
       CreateComponentError.prototype = Object.create(Error.prototype);
-      CreateComponentError.prototype.constructor = CreateComponentError;
 
       return {
         ApexActionError: ApexActionError,

@@ -6,7 +6,6 @@
       this.stack = (new Error()).stack;
     }
     CustomClientError.prototype = Object.create(Error.prototype);
-    CustomClientError.prototype.constructor = CustomClientError;
     component.lax.util.registerError(CustomClientError);
 
     const errors = component.lax.errors;
