@@ -336,7 +336,7 @@
         },
 
         /**
-         * @link https://github.com/developit/dlv
+         * {@link https://github.com/developit/dlv}
          */
         delve: function (obj, key, def, p) {
           p = 0;
