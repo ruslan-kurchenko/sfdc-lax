@@ -1,0 +1,7 @@
+<aura:component>
+    <aura:attribute name="record" type="Contact" />
+    <aura:handler name="init" value="{!this}" action="{!c.onInit}"/>
+    <c:ContactService aura:id="contactService" />
+
+    <!--Display Record Details ... -->
+</aura:component>

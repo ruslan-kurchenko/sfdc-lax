@@ -1,0 +1,9 @@
+<aura:component controller="ContactController">
+    <c:lax context="{!this}" />
+
+    <aura:method name="getByEmail"
+                 action="{!c.onGetByEmail}"
+                 description="The method to select a Contact record by Email">
+        <aura:attribute name="email" type="String" />
+    </aura:method>
+</aura:component>
