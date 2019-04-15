@@ -20,7 +20,7 @@ Lax is a Lightning Component to write a clear asynchronous JavaScript code. It h
 
 Click on the button below to deploy the component to the org
 
-[![Deploy to Salesforce](https://raw.githubusercontent.com/afawcett/githubsfdeploy/master/src/main/webapp/resources/img/deploy.png)](https://githubsfdeploy.herokuapp.com/app/githubdeploy/ruslan-kurchenko/sfdc-lax)
+[![Deploy to Salesforce](https://raw.githubusercontent.com/afawcett/githubsfdeploy/mdapi-sources/src/main/webapp/resources/img/deploy.png)](https://githubsfdeploy.herokuapp.com/app/githubdeploy/ruslan-kurchenko/sfdc-lax)
 
 ## Usage
 
