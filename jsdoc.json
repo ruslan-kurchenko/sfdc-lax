@@ -4,7 +4,7 @@
     "dictionaries": ["jsdoc","closure"]
   },
   "source": {
-    "include": "./src/aura",
+    "include": "./src/main/default/aura",
     "includePattern": ".js$",
     "excludePattern": "(node_modules/|docs)"
   },
