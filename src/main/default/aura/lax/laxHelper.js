@@ -265,12 +265,13 @@
        * @returns {LaxPromise}
        */
         createAuraContextPromise: function (promise) {
-          var lp = Object.create(promise);
-          Object.defineProperty(lp, '_contextPromise', {
-            writable: false,
-            configurable: false,
-            enumerable: true,
-            value: promise
+          var lp = Object.create(null, {
+            _contextPromise: {
+              writable: false,
+              configurable: false,
+              enumerable: true,
+              value: promise
+            }
           });
           // eslint-disable-next-line no-use-before-define
           return Object.assign(lp, laxPromise);
